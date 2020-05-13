@@ -1,0 +1,30 @@
+[
+    {
+        "studentID": 555,
+        "name": "sdsfsf",
+        "surname": "sdsfsf",
+        "programme": 555,
+        "faculty": 654,
+        "form": 66,
+        "lng": "sdsfsf",
+        "phones": [
+            {
+                "phone": "54567654646"
+            },
+            {
+                "phone2": "sfdgbgfb"
+            }
+        ],
+        "emails": [
+            {
+                "email": "sfsfsf@tsi.lv"
+            },
+            {
+                "email": "sfsdgfsd@gfds.lv"
+            }
+        ],
+        "skype": "dfsdfsdf",
+        "comments": "sfdsfsdfsdsdfsdf",
+        "status": ""
+    }
+]

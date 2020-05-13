@@ -1,0 +1,48 @@
+[
+    {
+        "facultyCode": 555,
+        "title_LV": "sfsfs",
+        "title_RU": "sdsdsd",
+        "title_EN": "fsdfds",
+        "short_title_LV": "sfsfs",
+        "short_title_RU": "sdsdsd",
+        "short_title_EN": "fsdfds",
+        "studyprogrammes": [
+            {
+                "programmeID": 4444,
+                "title_LV": "sfsfs",
+                "title_RU": "sdsdsd",
+                "title_EN": "fsdfds"
+            },
+            {
+                "programmeID": 65,
+                "title_LV": "sfsfs",
+                "title_RU": "sdsdsd",
+                "title_EN": "fsdfds"
+            }
+        ]
+    },
+    {
+        "facultyCode": 64558,
+        "title_LV": "sfsfs",
+        "title_RU": "sdsdsd",
+        "title_EN": "fsdfds",
+        "short_title_LV": "sfsfs",
+        "short_title_RU": "sdsdsd",
+        "short_title_EN": "fsdfds",
+        "studyprogrammes": [
+            {
+                "programmeID": 655,
+                "title_LV": "sfsfs",
+                "title_RU": "sdsdsd",
+                "title_EN": "fsdfds"
+            },
+            {
+                "programmeID": 6587,
+                "title_LV": "sfsfs",
+                "title_RU": "sdsdsd",
+                "title_EN": "fsdfds"
+            }
+        ]
+    }
+]

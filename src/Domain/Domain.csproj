@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>tti_graduation_work.Domain</RootNamespace>
+    <AssemblyName>tti_graduation_work.Domain</AssemblyName>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+[
+    {
+        "staffID": 555,
+        "name": "sdsfsf",
+        "surname": "sdsfsf",
+        "faculty": {
+            "RUS": "",
+            "LVL": "dsd",
+            "ENG": ""
+        },
+        "chair": {
+            "RUS": "",
+            "LVL": "dsd",
+            "ENG": ""
+        },
+        "lng": {
+            "RUS": "YES",
+            "LVL": "NO",
+            "ENG": "YES"
+        },
+        "phone": "",
+        "email": "sd@fg",
+        "position": {
+            "RUS": "",
+            "LVL": "dsd",
+            "ENG": ""
+        },
+        "degree": "Dr.sc.ing"
+    }
+]
