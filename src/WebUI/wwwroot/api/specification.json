@@ -56,6 +56,24 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": [
+          "GraduationPaper"
+        ],
+        "operationId": "GraduationPaper_GetPaper",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraduationPaperDto2"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/Home": {
@@ -186,12 +204,12 @@
         }
       }
     },
-    "/api/Steps/{id}": {
+    "/api/Steps/{id}/Steps": {
       "get": {
         "tags": [
           "Steps"
         ],
-        "operationId": "Steps_Get",
+        "operationId": "Steps_GetSteps",
         "parameters": [
           {
             "name": "id",
@@ -223,7 +241,7 @@
         "tags": [
           "Steps"
         ],
-        "operationId": "Steps_Get2",
+        "operationId": "Steps_GetStep",
         "parameters": [
           {
             "name": "id",
@@ -1321,6 +1339,32 @@
           }
         }
       },
+      "GraduationPaperDto2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title_RU": {
+            "type": "string",
+            "nullable": true
+          },
+          "title_EN": {
+            "type": "string",
+            "nullable": true
+          },
+          "title_LV": {
+            "type": "string",
+            "nullable": true
+          },
+          "supervisor": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "ProfileVm": {
         "type": "object",
         "additionalProperties": false,
@@ -1426,7 +1470,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/GraduationPaperDto2"
+                "$ref": "#/components/schemas/GraduationPaperDto3"
               }
             ]
           }
@@ -1478,7 +1522,7 @@
           }
         }
       },
-      "GraduationPaperDto2": {
+      "GraduationPaperDto3": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

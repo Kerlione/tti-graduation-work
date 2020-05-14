@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { MatTableModule } from '@angular/material/table/';
 import { MatSidenavModule } from '@angular/material/sidenav/';
@@ -10,7 +11,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
 
 import { AppComponent } from './app.component';
 import { SidenavComponent } from '../app/common/sidenav/sidenav.component';
@@ -41,7 +49,8 @@ const appRoutes: Routes = [
     SidenavComponent,
     StudentsTableComponent,
     GraduationPapersTableComponent,
-    GraduationPapersDetailsComponent
+    GraduationPapersDetailsComponent,
+    StepFormComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -50,18 +59,19 @@ const appRoutes: Routes = [
     ),
     ModalModule.forRoot(),
     NoopAnimationsModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    // Material
     MatTableModule,
     MatSidenavModule,
     MatListModule,
-    HttpClientModule,
     MatPaginatorModule,
     MatToolbarModule,
     MatProgressSpinnerModule,
     MatDividerModule,
     MatButtonModule,
     MatSnackBarModule,
-    FormsModule,
-    ReactiveFormsModule
   ],
   bootstrap: [AppComponent],
   providers: [

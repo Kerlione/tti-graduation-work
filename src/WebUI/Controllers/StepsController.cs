@@ -40,14 +40,14 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<StepsVm>> Get(int id)
+        [HttpGet("{id}/Steps")]
+        public async Task<ActionResult<StepsVm>> GetSteps(int id)
         { 
             return await Mediator.Send(new GetStepsQuery { GraduationPaperId = id });
         }
 
         [HttpPost("{id}/Step/{stepId}")]
-        public async Task<ActionResult<SingleStep>> Get(int id, int stepId, GetStepQuery request)
+        public async Task<ActionResult<SingleStep>> GetStep(int id, int stepId, GetStepQuery request)
         {
             if(id != request.GraduationPaperId)
             {

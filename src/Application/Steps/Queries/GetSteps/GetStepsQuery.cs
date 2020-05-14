@@ -46,8 +46,8 @@ namespace tti_graduation_work.Application.Steps.Queries.GetSteps
                 .Cast<StepStatus>()
                 .Select(r => new StepStatusDto { Value = (int)r, Name = r.ToString() })
                 .ToList(),
-                Types = Enum.GetValues(typeof(StepType))
-                .Cast<StepType>()
+                Types = Enum.GetValues(typeof(PaperStep))
+                .Cast<PaperStep>()
                 .Select(r => new StepTypeDto { Value = (int)r, Name = r.ToString() })
                 .ToList(),
                 Steps = await steps.ToListAsync(cancellationToken),

@@ -11,7 +11,7 @@ namespace tti_graduation_work.Domain.Entities
         public int Id { get; set; }
         public int StudentId { get; set; }
         public Student Student { get; set; }
-        public int SupervisorId { get; set; }
+        public int? SupervisorId { get; set; }
         public Supervisor Supervisor { get; set; }
         public int Year { get; set; }
         public int FacultyId { get; set; }

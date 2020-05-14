@@ -13,7 +13,8 @@ namespace tti_graduation_work.Infrastructure.Persistence.Configurations
         {
             builder
                 .HasOne(g => g.Supervisor)
-                .WithMany(s => s.GraduationPapers);
+                .WithMany(s => s.GraduationPapers)
+                .IsRequired(false);
 
             builder
                 .HasOne(g => g.Student)

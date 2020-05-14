@@ -82,6 +82,7 @@ export class FacultiesClient implements IFacultiesClient {
 
 export interface IGraduationPaperClient {
     get(request: GetGraduationPapersQuery): Observable<GraduationPapersVm>;
+    getPaper(): Observable<GraduationPaperDto2>;
 }
 
 @Injectable({
@@ -147,6 +148,54 @@ export class GraduationPaperClient implements IGraduationPaperClient {
             }));
         }
         return _observableOf<GraduationPapersVm>(<any>null);
+    }
+
+    getPaper(): Observable<GraduationPaperDto2> {
+        let url_ = this.baseUrl + "/api/GraduationPaper";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaper(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaper(<any>response_);
+                } catch (e) {
+                    return <Observable<GraduationPaperDto2>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GraduationPaperDto2>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaper(response: HttpResponseBase): Observable<GraduationPaperDto2> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GraduationPaperDto2.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<GraduationPaperDto2>(<any>null);
     }
 }
 
@@ -268,8 +317,8 @@ export class HomeClient implements IHomeClient {
 export interface IStepsClient {
     notifyStudent(id: number, request: NotifyStudentCommand): Observable<FileResponse>;
     notifySupervisor(id: number, request: NotifySupervisorCommand): Observable<FileResponse>;
-    get(id: number): Observable<StepsVm>;
-    get2(id: number, stepId: number, request: GetStepQuery): Observable<StepDto2>;
+    getSteps(id: number): Observable<StepsVm>;
+    getStep(id: number, stepId: number, request: GetStepQuery): Observable<StepDto2>;
     uploadAttachment(id: number, stepId: number, request: UploadAttachmentCommand): Observable<number>;
     updateStep(id: number, stepId: number, request: UpdateStepCommand): Observable<FileResponse>;
     approveStep(id: number, stepId: number, request: ApproveStepCommand): Observable<FileResponse>;
@@ -396,8 +445,8 @@ export class StepsClient implements IStepsClient {
         return _observableOf<FileResponse>(<any>null);
     }
 
-    get(id: number): Observable<StepsVm> {
-        let url_ = this.baseUrl + "/api/Steps/{id}";
+    getSteps(id: number): Observable<StepsVm> {
+        let url_ = this.baseUrl + "/api/Steps/{id}/Steps";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -412,11 +461,11 @@ export class StepsClient implements IStepsClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
+            return this.processGetSteps(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGet(<any>response_);
+                    return this.processGetSteps(<any>response_);
                 } catch (e) {
                     return <Observable<StepsVm>><any>_observableThrow(e);
                 }
@@ -425,7 +474,7 @@ export class StepsClient implements IStepsClient {
         }));
     }
 
-    protected processGet(response: HttpResponseBase): Observable<StepsVm> {
+    protected processGetSteps(response: HttpResponseBase): Observable<StepsVm> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -447,7 +496,7 @@ export class StepsClient implements IStepsClient {
         return _observableOf<StepsVm>(<any>null);
     }
 
-    get2(id: number, stepId: number, request: GetStepQuery): Observable<StepDto2> {
+    getStep(id: number, stepId: number, request: GetStepQuery): Observable<StepDto2> {
         let url_ = this.baseUrl + "/api/Steps/{id}/Step/{stepId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -470,11 +519,11 @@ export class StepsClient implements IStepsClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet2(response_);
+            return this.processGetStep(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGet2(<any>response_);
+                    return this.processGetStep(<any>response_);
                 } catch (e) {
                     return <Observable<StepDto2>><any>_observableThrow(e);
                 }
@@ -483,7 +532,7 @@ export class StepsClient implements IStepsClient {
         }));
     }
 
-    protected processGet2(response: HttpResponseBase): Observable<StepDto2> {
+    protected processGetStep(response: HttpResponseBase): Observable<StepDto2> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -2059,6 +2108,58 @@ export interface IGetGraduationPapersQuery {
     take?: number;
 }
 
+export class GraduationPaperDto2 implements IGraduationPaperDto2 {
+    id?: number;
+    title_RU?: string | undefined;
+    title_EN?: string | undefined;
+    title_LV?: string | undefined;
+    supervisor?: string | undefined;
+
+    constructor(data?: IGraduationPaperDto2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title_RU = _data["title_RU"];
+            this.title_EN = _data["title_EN"];
+            this.title_LV = _data["title_LV"];
+            this.supervisor = _data["supervisor"];
+        }
+    }
+
+    static fromJS(data: any): GraduationPaperDto2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new GraduationPaperDto2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title_RU"] = this.title_RU;
+        data["title_EN"] = this.title_EN;
+        data["title_LV"] = this.title_LV;
+        data["supervisor"] = this.supervisor;
+        return data; 
+    }
+}
+
+export interface IGraduationPaperDto2 {
+    id?: number;
+    title_RU?: string | undefined;
+    title_EN?: string | undefined;
+    title_LV?: string | undefined;
+    supervisor?: string | undefined;
+}
+
 export class ProfileVm implements IProfileVm {
     firstName?: string | undefined;
     lastName?: string | undefined;
@@ -2253,7 +2354,7 @@ export class StepsVm implements IStepsVm {
     statuses?: StepStatusDto[] | undefined;
     types?: StepTypeDto[] | undefined;
     steps?: StepDto[] | undefined;
-    gradautionPaper?: GraduationPaperDto2 | undefined;
+    gradautionPaper?: GraduationPaperDto3 | undefined;
 
     constructor(data?: IStepsVm) {
         if (data) {
@@ -2281,7 +2382,7 @@ export class StepsVm implements IStepsVm {
                 for (let item of _data["steps"])
                     this.steps!.push(StepDto.fromJS(item));
             }
-            this.gradautionPaper = _data["gradautionPaper"] ? GraduationPaperDto2.fromJS(_data["gradautionPaper"]) : <any>undefined;
+            this.gradautionPaper = _data["gradautionPaper"] ? GraduationPaperDto3.fromJS(_data["gradautionPaper"]) : <any>undefined;
         }
     }
 
@@ -2318,7 +2419,7 @@ export interface IStepsVm {
     statuses?: StepStatusDto[] | undefined;
     types?: StepTypeDto[] | undefined;
     steps?: StepDto[] | undefined;
-    gradautionPaper?: GraduationPaperDto2 | undefined;
+    gradautionPaper?: GraduationPaperDto3 | undefined;
 }
 
 export class StepStatusDto implements IStepStatusDto {
@@ -2445,13 +2546,13 @@ export interface IStepDto {
     stepStatus?: number;
 }
 
-export class GraduationPaperDto2 implements IGraduationPaperDto2 {
+export class GraduationPaperDto3 implements IGraduationPaperDto3 {
     title?: string | undefined;
     student?: string | undefined;
     supervisor?: string | undefined;
     year?: number;
 
-    constructor(data?: IGraduationPaperDto2) {
+    constructor(data?: IGraduationPaperDto3) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2469,9 +2570,9 @@ export class GraduationPaperDto2 implements IGraduationPaperDto2 {
         }
     }
 
-    static fromJS(data: any): GraduationPaperDto2 {
+    static fromJS(data: any): GraduationPaperDto3 {
         data = typeof data === 'object' ? data : {};
-        let result = new GraduationPaperDto2();
+        let result = new GraduationPaperDto3();
         result.init(data);
         return result;
     }
@@ -2486,7 +2587,7 @@ export class GraduationPaperDto2 implements IGraduationPaperDto2 {
     }
 }
 
-export interface IGraduationPaperDto2 {
+export interface IGraduationPaperDto3 {
     title?: string | undefined;
     student?: string | undefined;
     supervisor?: string | undefined;

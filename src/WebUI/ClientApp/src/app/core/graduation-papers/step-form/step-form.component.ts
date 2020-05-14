@@ -1,93 +1,71 @@
-import { Component } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { StepFormService } from 'src/app/services/step-form.service';
+import { QuestionBase } from 'src/app/models/question-base';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
+import { StepsClient, GetStepQuery, StepDto2 } from 'src/app/tti_graduation_work-api';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-step-form',
   templateUrl: './step-form.component.html',
-  styleUrls: ['./step-form.component.css']
+  styleUrls: ['./step-form.component.css'],
+  providers: [StepFormService]
 })
-export class StepFormComponent {
-  addressForm = this.fb.group({
-    company: null,
-    firstName: [null, Validators.required],
-    lastName: [null, Validators.required],
-    address: [null, Validators.required],
-    address2: null,
-    city: [null, Validators.required],
-    state: [null, Validators.required],
-    postalCode: [null, Validators.compose([
-      Validators.required, Validators.minLength(5), Validators.maxLength(5)])
-    ],
-    shipping: ['free', Validators.required]
-  });
+export class StepFormComponent implements OnInit {
+  @Input() questions: QuestionBase<any>[] = [];
+  @Input() isDialog: boolean;
 
-  hasUnitNumber = false;
+  @Output() close = new EventEmitter<any>();
+  @Output() submit = new EventEmitter<any>();
+  form: FormGroup;
+  payLoad = '';
+  stepId: number;
+  paperId: number;
+  stepData: StepDto2;
+  constructor(
+    private sfs: StepFormService,
+    private _snackBar: MatSnackBar,
+    private route: ActivatedRoute,
+    private stepsClient: StepsClient) { }
 
-  states = [
-    {name: 'Alabama', abbreviation: 'AL'},
-    {name: 'Alaska', abbreviation: 'AK'},
-    {name: 'American Samoa', abbreviation: 'AS'},
-    {name: 'Arizona', abbreviation: 'AZ'},
-    {name: 'Arkansas', abbreviation: 'AR'},
-    {name: 'California', abbreviation: 'CA'},
-    {name: 'Colorado', abbreviation: 'CO'},
-    {name: 'Connecticut', abbreviation: 'CT'},
-    {name: 'Delaware', abbreviation: 'DE'},
-    {name: 'District Of Columbia', abbreviation: 'DC'},
-    {name: 'Federated States Of Micronesia', abbreviation: 'FM'},
-    {name: 'Florida', abbreviation: 'FL'},
-    {name: 'Georgia', abbreviation: 'GA'},
-    {name: 'Guam', abbreviation: 'GU'},
-    {name: 'Hawaii', abbreviation: 'HI'},
-    {name: 'Idaho', abbreviation: 'ID'},
-    {name: 'Illinois', abbreviation: 'IL'},
-    {name: 'Indiana', abbreviation: 'IN'},
-    {name: 'Iowa', abbreviation: 'IA'},
-    {name: 'Kansas', abbreviation: 'KS'},
-    {name: 'Kentucky', abbreviation: 'KY'},
-    {name: 'Louisiana', abbreviation: 'LA'},
-    {name: 'Maine', abbreviation: 'ME'},
-    {name: 'Marshall Islands', abbreviation: 'MH'},
-    {name: 'Maryland', abbreviation: 'MD'},
-    {name: 'Massachusetts', abbreviation: 'MA'},
-    {name: 'Michigan', abbreviation: 'MI'},
-    {name: 'Minnesota', abbreviation: 'MN'},
-    {name: 'Mississippi', abbreviation: 'MS'},
-    {name: 'Missouri', abbreviation: 'MO'},
-    {name: 'Montana', abbreviation: 'MT'},
-    {name: 'Nebraska', abbreviation: 'NE'},
-    {name: 'Nevada', abbreviation: 'NV'},
-    {name: 'New Hampshire', abbreviation: 'NH'},
-    {name: 'New Jersey', abbreviation: 'NJ'},
-    {name: 'New Mexico', abbreviation: 'NM'},
-    {name: 'New York', abbreviation: 'NY'},
-    {name: 'North Carolina', abbreviation: 'NC'},
-    {name: 'North Dakota', abbreviation: 'ND'},
-    {name: 'Northern Mariana Islands', abbreviation: 'MP'},
-    {name: 'Ohio', abbreviation: 'OH'},
-    {name: 'Oklahoma', abbreviation: 'OK'},
-    {name: 'Oregon', abbreviation: 'OR'},
-    {name: 'Palau', abbreviation: 'PW'},
-    {name: 'Pennsylvania', abbreviation: 'PA'},
-    {name: 'Puerto Rico', abbreviation: 'PR'},
-    {name: 'Rhode Island', abbreviation: 'RI'},
-    {name: 'South Carolina', abbreviation: 'SC'},
-    {name: 'South Dakota', abbreviation: 'SD'},
-    {name: 'Tennessee', abbreviation: 'TN'},
-    {name: 'Texas', abbreviation: 'TX'},
-    {name: 'Utah', abbreviation: 'UT'},
-    {name: 'Vermont', abbreviation: 'VT'},
-    {name: 'Virgin Islands', abbreviation: 'VI'},
-    {name: 'Virginia', abbreviation: 'VA'},
-    {name: 'Washington', abbreviation: 'WA'},
-    {name: 'West Virginia', abbreviation: 'WV'},
-    {name: 'Wisconsin', abbreviation: 'WI'},
-    {name: 'Wyoming', abbreviation: 'WY'}
-  ];
-
-  constructor(private fb: FormBuilder) {}
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.paperId = params['id'];
+      this.stepId = params['stepId'];
+      let request = new GetStepQuery();
+      request.graduationPaperId =  this.paperId;
+      request.stepId = this.stepId;
+      this.stepsClient.getStep(this.paperId, this.stepId,
+        request)
+        .subscribe(result => {
+          if (result) {
+            this.stepData = result;
+            console.log(this.stepData);
+            this.form = this.sfs.toFormGroup(this.questions);
+          }
+        },
+          error => {
+            console.error(error);
+          });
+    });
+  }
 
   onSubmit() {
-    alert('Thanks!');
+    this._snackBar.open(`Saved Successfully`, '', {
+      duration: 2000,
+      panelClass: 'snackbar-success',
+      verticalPosition: 'top',
+      horizontalPosition: 'right'
+    }).afterOpened().subscribe(() => {
+      this.submit.emit(this.form.value);
+      this.payLoad = JSON.stringify(this.form.value);
+      console.log('Saved the following values', this.payLoad);
+    });
+  }
+
+  onCancel() {
+    this.close.emit(null);
   }
 }
