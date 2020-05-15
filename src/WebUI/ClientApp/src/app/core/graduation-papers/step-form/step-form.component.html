@@ -1,14 +1,22 @@
-<div>
-  <form (ngSubmit)="onSubmit()" [formGroup]="form">
+<div style="width: 100%">
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" [style.fontSize.px]="15" *ngIf="isForm">
 
-    <div *ngFor="let question of questions" class="form-row">
-      <app-question [question]="question" [form]="form"></app-question>
-    </div>
+        <div *ngFor="let question of questions" class="form-row">
+            <app-form-field [question]="question" [form]="form"></app-form-field>
+        </div>
 
-    <div class="form-row">
-      <button mat-stroked-button type="submit" [disabled]="!form.valid">Save</button>
-      <button *ngIf="isDialog" mat-stroked-button type="button" (click)="onCancel()">Cancel</button>
-    </div>
-  </form>
+        <div class="form-row">
+            <button mat-stroked-button type="submit" [disabled]="!form.valid">Save</button>
+            <button mat-stroked-button color="primary" [disabled]="!form.valid && stepData.stepStatus !== 4" (click)="finishStep()">Finish</button>
+            <button mat-stroked-button color="accent" [disabled]="!form.valid && stepData.stepStatus !== 2" (click)="sendToReview()">Send to Review</button>
+            <button mat-stroked-button color="warn">Cancel</button>
+        </div>
+    </form>
 
+
+    <mat-card *ngIf="!isForm">
+        <mat-card-header>
+            <mat-card-title>{{question.label}}</mat-card-title>
+        </mat-card-header>
+    </mat-card>
 </div>

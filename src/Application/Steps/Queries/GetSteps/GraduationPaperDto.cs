@@ -11,6 +11,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetSteps
         public string Title { get; set; }
         public string Student { get; set; }
         public string Supervisor { get; set; }
+        public int SupervisorId { get; set; }
         public int Year { get; set; }
     }
 }

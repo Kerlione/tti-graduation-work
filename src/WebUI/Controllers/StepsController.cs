@@ -8,8 +8,10 @@ using tti_graduation_work.Application.Steps.Commands.FinishStep;
 using tti_graduation_work.Application.Steps.Commands.NotifyStudent;
 using tti_graduation_work.Application.Steps.Commands.NotifySupervisor;
 using tti_graduation_work.Application.Steps.Commands.RejectStep;
+using tti_graduation_work.Application.Steps.Commands.SendStepToReviewRequest;
 using tti_graduation_work.Application.Steps.Commands.UpdateStepCommand;
 using tti_graduation_work.Application.Steps.Commands.UploadAttachment;
+using tti_graduation_work.Application.Steps.Queries.GetAvailableSupervisors;
 using tti_graduation_work.Application.Steps.Queries.GetStep;
 using tti_graduation_work.Application.Steps.Queries.GetSteps;
 using SingleStep = tti_graduation_work.Application.Steps.Queries.GetStep.StepDto;
@@ -47,19 +49,9 @@ namespace tti_graduation_work.WebUI.Controllers
         }
 
         [HttpPost("{id}/Step/{stepId}")]
-        public async Task<ActionResult<SingleStep>> GetStep(int id, int stepId, GetStepQuery request)
-        {
-            if(id != request.GraduationPaperId)
-            {
-                return BadRequest();
-            }
-
-            if(stepId != request.StepId)
-            {
-                return BadRequest();
-            }
-
-            return await Mediator.Send(request);
+        public async Task<ActionResult<SingleStep>> GetStep(int id, int stepId)
+        {            
+            return await Mediator.Send(new GetStepQuery{ GraduationPaperId = id, StepId = stepId });
         }
 
         [HttpPut("{id}/Step/{stepId}/Attachment")]
@@ -78,14 +70,9 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(request);
         }
 
-        [HttpPost("{id}/Step/{stepId}/Update")]
-        public async Task<ActionResult> UpdateStep(int id, int stepId, UpdateStepCommand request)
+        [HttpPut("Step/{stepId}/Update")]
+        public async Task<ActionResult> UpdateStep(int stepId, UpdateStepCommand request)
         {
-            if (id != request.GraduationPaperId)
-            {
-                return BadRequest();
-            }
-
             if (stepId != request.StepId)
             {
                 return BadRequest();
@@ -145,6 +132,28 @@ namespace tti_graduation_work.WebUI.Controllers
                 return BadRequest();
             }
 
+            await Mediator.Send(request);
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<SupervisorsVm>> GetAvailableSupervisors()
+        {
+            return await Mediator.Send(new GetAvailableSupervisorsQuery());
+        }
+
+        [HttpPost("{id}/Step/{stepId}/ToReview")]
+        public async Task<ActionResult> SendToReview(int id, int stepId, SendStepToReviewCommand request)
+        {
+            if(request.GraduationPaperId != id)
+            {
+                return BadRequest();
+            }
+            if(request.StepId != stepId)
+            {
+                return BadRequest();
+            }
             await Mediator.Send(request);
 
             return Ok();

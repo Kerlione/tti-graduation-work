@@ -13,7 +13,6 @@ namespace tti_graduation_work.Application.Steps.Commands.NotifyStudent
 {
     public class NotifyStudentCommand : IRequest
     {
-        public int StudentId { get; set; }
         public int GraduationPaperId { get; set; }
         public int StepId { get; set; }
     }
@@ -29,17 +28,6 @@ namespace tti_graduation_work.Application.Steps.Commands.NotifyStudent
         }
         public async Task<Unit> Handle(NotifyStudentCommand request, CancellationToken cancellationToken)
         {
-            var student = await _context.Students.FindAsync(request.StudentId);
-            if (student == null)
-            {
-                throw new NotFoundException($"Student not found");
-            }
-
-            if (request.GraduationPaperId != student.GranduationPaperId)
-            {
-                throw new NotAccessibleEntityException($"No graduation paper with id {request.GraduationPaperId} is available for student");
-            }
-
             var graduationPaper = await _context.GraduationPapers.FindAsync(request.GraduationPaperId);
 
             var step = graduationPaper.Steps.FirstOrDefault(x => x.Id == request.StepId);
@@ -47,6 +35,8 @@ namespace tti_graduation_work.Application.Steps.Commands.NotifyStudent
             {
                 throw new NotFoundException($"No step with id {request.StepId} is attached to graduation paper with id {request.GraduationPaperId}");
             }
+
+            var student = await _context.Students.FindAsync(graduationPaper.StudentId);
 
             var studentEmails = new List<string>
             {

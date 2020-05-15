@@ -14,7 +14,6 @@ namespace tti_graduation_work.Application.Steps.Commands.NotifySupervisor
 
     public class NotifySupervisorCommand : IRequest
     {
-        public int SupervisorId { get; set; }
         public int GraduationPaperId { get; set; }
         public int StepId { get; set; }
     }
@@ -30,17 +29,6 @@ namespace tti_graduation_work.Application.Steps.Commands.NotifySupervisor
         }
         public async Task<Unit> Handle(NotifySupervisorCommand request, CancellationToken cancellationToken)
         {
-            var supervisor = await _context.Supervisors.FindAsync(request.SupervisorId);
-            if (supervisor == null)
-            {
-                throw new NotFoundException($"Supervisor not found");
-            }
-
-            if (!supervisor.GraduationPapers.Any(x => x.Id == request.GraduationPaperId))
-            {
-                throw new NotAccessibleEntityException($"No graduation paper with id {request.GraduationPaperId} is assigned for supervisor");
-            }
-
             var graduationPaper = await _context.GraduationPapers.FindAsync(request.GraduationPaperId);
 
             var step = graduationPaper.Steps.FirstOrDefault(x => x.Id == request.StepId);
@@ -48,6 +36,13 @@ namespace tti_graduation_work.Application.Steps.Commands.NotifySupervisor
             {
                 throw new NotFoundException($"No step with id {request.StepId} is attached to graduation paper with id {request.GraduationPaperId}");
             }
+
+            if (!graduationPaper.SupervisorId.HasValue)
+            {
+                throw new NotFoundException($"No supervisor is attached to the graduation paper");
+            }
+
+            var supervisor = await _context.Supervisors.FindAsync(graduationPaper.SupervisorId);
 
             if (!string.IsNullOrEmpty(supervisor.Email))
             {

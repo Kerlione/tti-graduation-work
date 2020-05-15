@@ -318,12 +318,14 @@ export interface IStepsClient {
     notifyStudent(id: number, request: NotifyStudentCommand): Observable<FileResponse>;
     notifySupervisor(id: number, request: NotifySupervisorCommand): Observable<FileResponse>;
     getSteps(id: number): Observable<StepsVm>;
-    getStep(id: number, stepId: number, request: GetStepQuery): Observable<StepDto2>;
+    getStep(id: number, stepId: number): Observable<StepDto2>;
     uploadAttachment(id: number, stepId: number, request: UploadAttachmentCommand): Observable<number>;
-    updateStep(id: number, stepId: number, request: UpdateStepCommand): Observable<FileResponse>;
+    updateStep(stepId: number, request: UpdateStepCommand): Observable<FileResponse>;
     approveStep(id: number, stepId: number, request: ApproveStepCommand): Observable<FileResponse>;
     rejectStep(id: number, stepId: number, request: RejectStepCommand): Observable<FileResponse>;
     finishStep(id: number, stepId: number, request: FinishStepCommand): Observable<FileResponse>;
+    getAvailableSupervisors(): Observable<SupervisorsVm>;
+    sendToReview(id: number, stepId: number, request: SendStepToReviewCommand): Observable<FileResponse>;
 }
 
 @Injectable({
@@ -496,7 +498,7 @@ export class StepsClient implements IStepsClient {
         return _observableOf<StepsVm>(<any>null);
     }
 
-    getStep(id: number, stepId: number, request: GetStepQuery): Observable<StepDto2> {
+    getStep(id: number, stepId: number): Observable<StepDto2> {
         let url_ = this.baseUrl + "/api/Steps/{id}/Step/{stepId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -506,14 +508,10 @@ export class StepsClient implements IStepsClient {
         url_ = url_.replace("{stepId}", encodeURIComponent("" + stepId)); 
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(request);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",			
             headers: new HttpHeaders({
-                "Content-Type": "application/json", 
                 "Accept": "application/json"
             })
         };
@@ -612,11 +610,8 @@ export class StepsClient implements IStepsClient {
         return _observableOf<number>(<any>null);
     }
 
-    updateStep(id: number, stepId: number, request: UpdateStepCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Steps/{id}/Step/{stepId}/Update";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+    updateStep(stepId: number, request: UpdateStepCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Steps/Step/{stepId}/Update";
         if (stepId === undefined || stepId === null)
             throw new Error("The parameter 'stepId' must be defined.");
         url_ = url_.replace("{stepId}", encodeURIComponent("" + stepId)); 
@@ -634,7 +629,7 @@ export class StepsClient implements IStepsClient {
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processUpdateStep(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -817,6 +812,110 @@ export class StepsClient implements IStepsClient {
     }
 
     protected processFinishStep(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+
+    getAvailableSupervisors(): Observable<SupervisorsVm> {
+        let url_ = this.baseUrl + "/api/Steps";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableSupervisors(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableSupervisors(<any>response_);
+                } catch (e) {
+                    return <Observable<SupervisorsVm>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<SupervisorsVm>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAvailableSupervisors(response: HttpResponseBase): Observable<SupervisorsVm> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SupervisorsVm.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<SupervisorsVm>(<any>null);
+    }
+
+    sendToReview(id: number, stepId: number, request: SendStepToReviewCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Steps/{id}/Step/{stepId}/ToReview";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+        if (stepId === undefined || stepId === null)
+            throw new Error("The parameter 'stepId' must be defined.");
+        url_ = url_.replace("{stepId}", encodeURIComponent("" + stepId)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendToReview(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendToReview(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processSendToReview(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -2263,7 +2362,6 @@ export interface INewsVm {
 }
 
 export class NotifyStudentCommand implements INotifyStudentCommand {
-    studentId?: number;
     graduationPaperId?: number;
     stepId?: number;
 
@@ -2278,7 +2376,6 @@ export class NotifyStudentCommand implements INotifyStudentCommand {
 
     init(_data?: any) {
         if (_data) {
-            this.studentId = _data["studentId"];
             this.graduationPaperId = _data["graduationPaperId"];
             this.stepId = _data["stepId"];
         }
@@ -2293,7 +2390,6 @@ export class NotifyStudentCommand implements INotifyStudentCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["studentId"] = this.studentId;
         data["graduationPaperId"] = this.graduationPaperId;
         data["stepId"] = this.stepId;
         return data; 
@@ -2301,13 +2397,11 @@ export class NotifyStudentCommand implements INotifyStudentCommand {
 }
 
 export interface INotifyStudentCommand {
-    studentId?: number;
     graduationPaperId?: number;
     stepId?: number;
 }
 
 export class NotifySupervisorCommand implements INotifySupervisorCommand {
-    supervisorId?: number;
     graduationPaperId?: number;
     stepId?: number;
 
@@ -2322,7 +2416,6 @@ export class NotifySupervisorCommand implements INotifySupervisorCommand {
 
     init(_data?: any) {
         if (_data) {
-            this.supervisorId = _data["supervisorId"];
             this.graduationPaperId = _data["graduationPaperId"];
             this.stepId = _data["stepId"];
         }
@@ -2337,7 +2430,6 @@ export class NotifySupervisorCommand implements INotifySupervisorCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["supervisorId"] = this.supervisorId;
         data["graduationPaperId"] = this.graduationPaperId;
         data["stepId"] = this.stepId;
         return data; 
@@ -2345,7 +2437,6 @@ export class NotifySupervisorCommand implements INotifySupervisorCommand {
 }
 
 export interface INotifySupervisorCommand {
-    supervisorId?: number;
     graduationPaperId?: number;
     stepId?: number;
 }
@@ -2354,7 +2445,7 @@ export class StepsVm implements IStepsVm {
     statuses?: StepStatusDto[] | undefined;
     types?: StepTypeDto[] | undefined;
     steps?: StepDto[] | undefined;
-    gradautionPaper?: GraduationPaperDto3 | undefined;
+    graduationPaper?: GraduationPaperDto3 | undefined;
 
     constructor(data?: IStepsVm) {
         if (data) {
@@ -2382,7 +2473,7 @@ export class StepsVm implements IStepsVm {
                 for (let item of _data["steps"])
                     this.steps!.push(StepDto.fromJS(item));
             }
-            this.gradautionPaper = _data["gradautionPaper"] ? GraduationPaperDto3.fromJS(_data["gradautionPaper"]) : <any>undefined;
+            this.graduationPaper = _data["graduationPaper"] ? GraduationPaperDto3.fromJS(_data["graduationPaper"]) : <any>undefined;
         }
     }
 
@@ -2410,7 +2501,7 @@ export class StepsVm implements IStepsVm {
             for (let item of this.steps)
                 data["steps"].push(item.toJSON());
         }
-        data["gradautionPaper"] = this.gradautionPaper ? this.gradautionPaper.toJSON() : <any>undefined;
+        data["graduationPaper"] = this.graduationPaper ? this.graduationPaper.toJSON() : <any>undefined;
         return data; 
     }
 }
@@ -2419,7 +2510,7 @@ export interface IStepsVm {
     statuses?: StepStatusDto[] | undefined;
     types?: StepTypeDto[] | undefined;
     steps?: StepDto[] | undefined;
-    gradautionPaper?: GraduationPaperDto3 | undefined;
+    graduationPaper?: GraduationPaperDto3 | undefined;
 }
 
 export class StepStatusDto implements IStepStatusDto {
@@ -2550,6 +2641,7 @@ export class GraduationPaperDto3 implements IGraduationPaperDto3 {
     title?: string | undefined;
     student?: string | undefined;
     supervisor?: string | undefined;
+    supervisorId?: number;
     year?: number;
 
     constructor(data?: IGraduationPaperDto3) {
@@ -2566,6 +2658,7 @@ export class GraduationPaperDto3 implements IGraduationPaperDto3 {
             this.title = _data["title"];
             this.student = _data["student"];
             this.supervisor = _data["supervisor"];
+            this.supervisorId = _data["supervisorId"];
             this.year = _data["year"];
         }
     }
@@ -2582,6 +2675,7 @@ export class GraduationPaperDto3 implements IGraduationPaperDto3 {
         data["title"] = this.title;
         data["student"] = this.student;
         data["supervisor"] = this.supervisor;
+        data["supervisorId"] = this.supervisorId;
         data["year"] = this.year;
         return data; 
     }
@@ -2591,12 +2685,14 @@ export interface IGraduationPaperDto3 {
     title?: string | undefined;
     student?: string | undefined;
     supervisor?: string | undefined;
+    supervisorId?: number;
     year?: number;
 }
 
 export class StepDto2 implements IStepDto2 {
     id?: number;
     stepType?: number;
+    stepStatus?: number;
     data?: string | undefined;
     attachments?: AttachmentDto[] | undefined;
 
@@ -2613,6 +2709,7 @@ export class StepDto2 implements IStepDto2 {
         if (_data) {
             this.id = _data["id"];
             this.stepType = _data["stepType"];
+            this.stepStatus = _data["stepStatus"];
             this.data = _data["data"];
             if (Array.isArray(_data["attachments"])) {
                 this.attachments = [] as any;
@@ -2633,6 +2730,7 @@ export class StepDto2 implements IStepDto2 {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["stepType"] = this.stepType;
+        data["stepStatus"] = this.stepStatus;
         data["data"] = this.data;
         if (Array.isArray(this.attachments)) {
             data["attachments"] = [];
@@ -2646,6 +2744,7 @@ export class StepDto2 implements IStepDto2 {
 export interface IStepDto2 {
     id?: number;
     stepType?: number;
+    stepStatus?: number;
     data?: string | undefined;
     attachments?: AttachmentDto[] | undefined;
 }
@@ -2692,46 +2791,6 @@ export interface IAttachmentDto {
     id?: number;
     name?: string | undefined;
     data?: string | undefined;
-}
-
-export class GetStepQuery implements IGetStepQuery {
-    graduationPaperId?: number;
-    stepId?: number;
-
-    constructor(data?: IGetStepQuery) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.graduationPaperId = _data["graduationPaperId"];
-            this.stepId = _data["stepId"];
-        }
-    }
-
-    static fromJS(data: any): GetStepQuery {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetStepQuery();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["graduationPaperId"] = this.graduationPaperId;
-        data["stepId"] = this.stepId;
-        return data; 
-    }
-}
-
-export interface IGetStepQuery {
-    graduationPaperId?: number;
-    stepId?: number;
 }
 
 export class UploadAttachmentCommand implements IUploadAttachmentCommand {
@@ -2950,6 +3009,130 @@ export class FinishStepCommand implements IFinishStepCommand {
 }
 
 export interface IFinishStepCommand {
+    graduationPaperId?: number;
+    stepId?: number;
+}
+
+export class SupervisorsVm implements ISupervisorsVm {
+    list?: SupervisorSm[] | undefined;
+
+    constructor(data?: ISupervisorsVm) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["list"])) {
+                this.list = [] as any;
+                for (let item of _data["list"])
+                    this.list!.push(SupervisorSm.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SupervisorsVm {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupervisorsVm();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.list)) {
+            data["list"] = [];
+            for (let item of this.list)
+                data["list"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface ISupervisorsVm {
+    list?: SupervisorSm[] | undefined;
+}
+
+export class SupervisorSm implements ISupervisorSm {
+    key?: number;
+    value?: string | undefined;
+
+    constructor(data?: ISupervisorSm) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): SupervisorSm {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupervisorSm();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["value"] = this.value;
+        return data; 
+    }
+}
+
+export interface ISupervisorSm {
+    key?: number;
+    value?: string | undefined;
+}
+
+export class SendStepToReviewCommand implements ISendStepToReviewCommand {
+    graduationPaperId?: number;
+    stepId?: number;
+
+    constructor(data?: ISendStepToReviewCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.graduationPaperId = _data["graduationPaperId"];
+            this.stepId = _data["stepId"];
+        }
+    }
+
+    static fromJS(data: any): SendStepToReviewCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new SendStepToReviewCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["graduationPaperId"] = this.graduationPaperId;
+        data["stepId"] = this.stepId;
+        return data; 
+    }
+}
+
+export interface ISendStepToReviewCommand {
     graduationPaperId?: number;
     stepId?: number;
 }

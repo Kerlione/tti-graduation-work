@@ -9,6 +9,6 @@ namespace tti_graduation_work.Application.Steps.Queries.GetSteps
         public IList<StepStatusDto> Statuses { get; set; }
         public IList<StepTypeDto> Types { get; set; }
         public IList<StepDto> Steps { get; set; }
-        public GraduationPaperDto GradautionPaper { get; set; }
+        public GraduationPaperDto GraduationPaper { get; set; }
     }
 }

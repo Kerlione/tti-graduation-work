@@ -14,6 +14,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetStep
         }
         public int Id { get; set; }
         public int StepType { get; set; }
+        public int StepStatus { get; set; }
         public string Data { get; set; }
         public IList<AttachmentDto> Attachments { get; set; }
     }

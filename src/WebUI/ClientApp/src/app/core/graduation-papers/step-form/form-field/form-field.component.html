@@ -1,0 +1,27 @@
+<div [formGroup]="form" class="row">
+    <div [ngSwitch]="question.controlType">
+
+        <mat-form-field *ngSwitchCase="'textbox'" class="full-width">
+            <mat-label>{{question.label}}</mat-label>
+            <input matInput placeholder="Input" [id]="question.key" [type]="question.type" [formControlName]="question.key">
+        </mat-form-field>
+
+        <mat-form-field *ngSwitchCase="'dropdown'" class="full-width">
+            <mat-label>{{question.label}}</mat-label>
+            <mat-select [formControlName]="question.key">
+                <mat-option *ngFor="let opt of question.options" [value]="opt.key">
+                    {{opt.value}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <label *ngSwitchCase="'radio'" class="example-radio-label">{{question.label}}</label>
+        <mat-radio-group *ngSwitchCase="'radio'" [formControlName]="question.key" class="example-radio-group">
+            <mat-radio-button class="example-radio-button" *ngFor="let opt of question.options" [value]="opt.key">
+                {{opt.value}}
+            </mat-radio-button>
+        </mat-radio-group>
+    </div>
+
+    <div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>
+</div>

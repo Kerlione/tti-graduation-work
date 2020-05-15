@@ -2,16 +2,16 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { StepFormService } from 'src/app/services/step-form.service';
 import { QuestionBase } from 'src/app/models/question-base';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { StepsClient, GetStepQuery, StepDto2 } from 'src/app/tti_graduation_work-api';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { StepsClient, StepDto2, UpdateStepCommand, SendStepToReviewCommand, FinishStepCommand } from 'src/app/tti_graduation_work-api';
+import { FormGeneratorService } from 'src/app/services/form-generator.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-step-form',
   templateUrl: './step-form.component.html',
   styleUrls: ['./step-form.component.css'],
-  providers: [StepFormService]
+  providers: [StepFormService, FormGeneratorService, NotificationService]
 })
 export class StepFormComponent implements OnInit {
   @Input() questions: QuestionBase<any>[] = [];
@@ -19,50 +19,77 @@ export class StepFormComponent implements OnInit {
 
   @Output() close = new EventEmitter<any>();
   @Output() submit = new EventEmitter<any>();
-  form: FormGroup;
+  form: FormGroup = new FormGroup({});
   payLoad = '';
   stepId: number;
   paperId: number;
   stepData: StepDto2;
+  isForm: boolean = true;
   constructor(
     private sfs: StepFormService,
-    private _snackBar: MatSnackBar,
     private route: ActivatedRoute,
-    private stepsClient: StepsClient) { }
+    private stepsClient: StepsClient,
+    private fgs: FormGeneratorService,
+    private notificationService: NotificationService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.paperId = params['id'];
-      this.stepId = params['stepId'];
-      let request = new GetStepQuery();
-      request.graduationPaperId =  this.paperId;
-      request.stepId = this.stepId;
-      this.stepsClient.getStep(this.paperId, this.stepId,
-        request)
+      this.paperId = +params['id'];
+      this.stepId = +params['stepId'];
+      this.stepsClient.getStep(this.paperId, this.stepId)
         .subscribe(result => {
           if (result) {
             this.stepData = result;
-            console.log(this.stepData);
-            this.form = this.sfs.toFormGroup(this.questions);
+            this.stepsClient.getAvailableSupervisors().subscribe(res => {
+              if (res.list.length) {
+                this.questions = this.fgs.generateForm(this.stepData.stepType, res.list);
+                this.form = this.sfs.toFormGroup(this.questions);
+                this.form.setValue(JSON.parse(this.stepData.data));
+              }
+            });
           }
         },
           error => {
             console.error(error);
+            this.notificationService.error(error);
           });
     });
   }
 
   onSubmit() {
-    this._snackBar.open(`Saved Successfully`, '', {
-      duration: 2000,
-      panelClass: 'snackbar-success',
-      verticalPosition: 'top',
-      horizontalPosition: 'right'
-    }).afterOpened().subscribe(() => {
-      this.submit.emit(this.form.value);
-      this.payLoad = JSON.stringify(this.form.value);
-      console.log('Saved the following values', this.payLoad);
-    });
+    this.stepsClient.updateStep(this.stepId,
+      UpdateStepCommand.fromJS({ graduationPaperId: this.paperId, stepId: this.stepId, data: JSON.stringify(this.form.value) }))
+      .subscribe(result => {
+        this.notificationService.success('Saved!');
+      },
+        error => {
+          this.notificationService.error(error);
+        });
+  }
+
+  /**
+   * sendToReview
+   */
+  public sendToReview() {
+    this.stepsClient.sendToReview(this.paperId, this.stepId,
+      SendStepToReviewCommand.fromJS({ stepId: this.stepId, graduationPaperId: this.paperId })).subscribe(result => {
+        this.notificationService.success('Sent to review');
+        this.ngOnInit();
+      }, error => {
+        this.notificationService.error(error);
+      });
+  }
+
+  /**
+   * finishStep
+   */
+  public finishStep() {
+    this.stepsClient.finishStep(this.paperId, this.stepId,
+      FinishStepCommand.fromJS({ stepId: this.stepId, graduationPaperId: this.paperId })).subscribe(result => {
+        this.notificationService.success('Finished successfully');
+      }, error => {
+        this.notificationService.error(error);
+      });
   }
 
   onCancel() {

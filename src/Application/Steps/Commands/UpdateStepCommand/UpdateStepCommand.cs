@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using tti_graduation_work.Application.Common.Exceptions;
 using tti_graduation_work.Application.Common.Interfaces;
+using tti_graduation_work.Domain.Entities;
+using tti_graduation_work.Domain.Enums;
 
 namespace tti_graduation_work.Application.Steps.Commands.UpdateStepCommand
 {
@@ -46,9 +49,11 @@ namespace tti_graduation_work.Application.Steps.Commands.UpdateStepCommand
 
 			step.StepData = request.Data;
 
+			step.StepStatus = StepStatus.InProgress;
+
 			await _context.SaveChangesAsync(cancellationToken);
 
 			return Unit.Value;
-		}
+		}		
 	}
 }

@@ -57,7 +57,8 @@ namespace tti_graduation_work.Application.Steps.Queries.GetStep
                 Attachments = await attachments,
                 Data = step.StepData,
                 Id = step.Id,
-                StepType = (int)step.StepType
+                StepType = (int)step.StepType,
+                StepStatus = (int)step.StepStatus
             };
         }
     }

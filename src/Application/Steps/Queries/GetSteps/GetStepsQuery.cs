@@ -51,7 +51,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetSteps
                 .Select(r => new StepTypeDto { Value = (int)r, Name = r.ToString() })
                 .ToList(),
                 Steps = await steps.ToListAsync(cancellationToken),
-                GradautionPaper = _mapper.Map<GraduationPaperDto>(graduationPaper)
+                GraduationPaper = _mapper.Map<GraduationPaperDto>(graduationPaper)
             };
         }
     }

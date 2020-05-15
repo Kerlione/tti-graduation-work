@@ -30,6 +30,8 @@ import { GraduationPapersTableComponent } from './core/graduation-papers/graduat
 import { MatButtonModule } from '@angular/material/button';
 import { GraduationPapersDetailsComponent } from './core/graduation-papers/graduation-papers-details/graduation-papers-details.component';
 import { StepFormComponent } from './core/graduation-papers/step-form/step-form.component';
+import { FormFieldComponent } from './core/graduation-papers/step-form/form-field/form-field.component';
+import { RejectDialogComponent } from './core/graduation-papers/graduation-papers-details/reject-dialog/reject-dialog.component';
 
 
 const appRoutes: Routes = [
@@ -50,7 +52,9 @@ const appRoutes: Routes = [
     StudentsTableComponent,
     GraduationPapersTableComponent,
     GraduationPapersDetailsComponent,
-    StepFormComponent
+    StepFormComponent,
+    FormFieldComponent,
+    RejectDialogComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -72,6 +76,12 @@ const appRoutes: Routes = [
     MatDividerModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatTabsModule,
+    MatSelectModule,
+    MatRadioModule,
+    MatDialogModule
   ],
   bootstrap: [AppComponent],
   providers: [

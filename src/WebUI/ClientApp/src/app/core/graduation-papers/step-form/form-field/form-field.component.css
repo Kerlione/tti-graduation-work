@@ -1,0 +1,12 @@
+.row {
+    margin: 15px;
+}
+
+.full-width {
+    width: 100%;
+    display: block;
+}
+
+mat-label {
+    font-size: 15pt;
+}
