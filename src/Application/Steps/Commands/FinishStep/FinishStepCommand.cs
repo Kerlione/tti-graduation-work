@@ -51,44 +51,11 @@ namespace tti_graduation_work.Application.Steps.Commands.FinishStep
                 throw new NotSupportedException($"Step status is {Enum.GetName(typeof(StepStatus), step.StepStatus)} Finishing is not allowed");
             }
 
-            if (step.StepType == PaperStep.ThesisTopicApproval)
-            {
-                await UpdateGraduationPaperValues(request, cancellationToken);
-            }
-
             step.StepStatus = StepStatus.Finished;
 
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
-        }
-
-        /// <summary>
-        /// Update the GraduationPaper entity with valid values from approved step
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task UpdateGraduationPaperValues(FinishStepCommand request, CancellationToken cancellationToken)
-        {
-            var step = _context.Steps.Find(request.StepId);
-
-            if (step.StepStatus != StepStatus.Approved)
-            {
-                throw new NotSupportedException($"Step status is not correct for Paper data update");
-            }
-
-            var paper = _context.GraduationPapers.Find(request.GraduationPaperId);
-
-            var updatedData = JsonConvert.DeserializeObject<GraduationPaper>(step.StepData);
-
-            paper.Title_EN = updatedData.Title_EN;
-            paper.Title_RU = updatedData.Title_RU;
-            paper.Title_LV = updatedData.Title_LV;
-            paper.SupervisorId = updatedData.SupervisorId;
-
-            _context.GraduationPapers.Update(paper);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        }        
     }
 }

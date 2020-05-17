@@ -32,10 +32,12 @@ import { GraduationPapersDetailsComponent } from './core/graduation-papers/gradu
 import { StepFormComponent } from './core/graduation-papers/step-form/step-form.component';
 import { FormFieldComponent } from './core/graduation-papers/step-form/form-field/form-field.component';
 import { RejectDialogComponent } from './core/graduation-papers/graduation-papers-details/reject-dialog/reject-dialog.component';
+import { LoginComponent } from './common/login/login.component';
 
 
 const appRoutes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: '/home' },
+  { path: 'login', pathMatch: 'full', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'view/graduation-papers', component: GraduationPapersTableComponent },
   { path: 'view/graduation-papers/:id/details', component: GraduationPapersDetailsComponent },
@@ -54,7 +56,8 @@ const appRoutes: Routes = [
     GraduationPapersDetailsComponent,
     StepFormComponent,
     FormFieldComponent,
-    RejectDialogComponent
+    RejectDialogComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

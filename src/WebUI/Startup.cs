@@ -3,7 +3,6 @@ using tti_graduation_work.Application.Common.Interfaces;
 using tti_graduation_work.Infrastructure;
 using tti_graduation_work.Infrastructure.Persistence;
 using tti_graduation_work.WebUI.Filters;
-using tti_graduation_work.WebUI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +15,10 @@ using NSwag.Generation.Processors.Security;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using tti_graduation_work.Infrastructure.Email;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using tti_graduation_work.WebUI.Services;
 
 namespace tti_graduation_work.WebUI
 {
@@ -39,7 +42,6 @@ namespace tti_graduation_work.WebUI
                 logging.AddConsole();
                 logging.AddDebug();
             });
-
             services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             services.AddHttpContextAccessor();
@@ -67,11 +69,30 @@ namespace tti_graduation_work.WebUI
             services.AddOpenApiDocument(configure =>
             {
                 configure.Title = "tti_graduation_work API";
+                configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Type into the textbox: Bearer {your JWT token}."
+                });
+
+                configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+            });
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                    ValidateIssuerSigningKey = true
+                };
             });
 
             var emailConfiguration = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             services.AddSingleton(emailConfiguration);
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,7 +109,6 @@ namespace tti_graduation_work.WebUI
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHealthChecks("/health");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -104,6 +124,8 @@ namespace tti_graduation_work.WebUI
             });
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

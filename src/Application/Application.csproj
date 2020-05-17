@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="Common\Mappings\" />
+    <Folder Include="GraduationPapers\Commands\ChangeSupervisor\" />
   </ItemGroup>
 
 </Project>

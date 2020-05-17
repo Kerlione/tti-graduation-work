@@ -17,6 +17,7 @@ namespace tti_graduation_work.Application.Steps.Commands.RejectStep
 		public int StepId { get; set; }
 		public int GraduationPaperId { get; set; }
 		public string Reason { get; set; }
+		public bool DeassignSupervisor { get; set; }
 	}
 
 	public class RejectStepCommandHandler : IRequestHandler<RejectStepCommand>
@@ -54,6 +55,10 @@ namespace tti_graduation_work.Application.Steps.Commands.RejectStep
 
 			step.StepStatus = StepStatus.Rejected;
 			step.Comment = request.Reason;
+			if (request.DeassignSupervisor)
+			{
+				graduationPaper.SupervisorId = null;
+			}
 
 			await _context.SaveChangesAsync(cancellationToken);
 

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using tti_graduation_work.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace tti_graduation_work.Infrastructure
 {
@@ -36,8 +38,7 @@ namespace tti_graduation_work.Infrastructure
             services.AddTransient<IExternalAuthenticationService, ExternalAuthenticationService>();
             services.AddTransient<INotificationService, NotificationService>();
 
-            services.AddAuthentication()
-                .AddIdentityServerJwt();
+            services.AddTransient<IAuthRepository, AuthRepository>();
 
             return services;
         }

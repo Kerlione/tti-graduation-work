@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ using tti_graduation_work.WebUI.Enums;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
+    [Authorize]
     public class SupervisorsController : ApiController
     {
         [HttpPost("{id}/Profile")]

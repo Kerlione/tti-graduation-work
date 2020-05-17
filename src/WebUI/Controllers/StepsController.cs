@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ using SingleStep = tti_graduation_work.Application.Steps.Queries.GetStep.StepDto
 
 namespace tti_graduation_work.WebUI.Controllers
 {
+    [Authorize]
     public class StepsController : ApiController
     {
         [HttpPost("NotifyStudent/{id}")]

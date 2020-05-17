@@ -16,16 +16,12 @@ namespace tti_graduation_work.Infrastructure.Persistence
 {
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
-        private readonly ICurrentUserService _currentUserService;
         private readonly IDateTime _dateTime;
-        private IDbContextTransaction _currentTransaction;
 
         public ApplicationDbContext(
             DbContextOptions options,
-            ICurrentUserService currentUserService,
             IDateTime dateTime) : base(options)
         {
-            _currentUserService = currentUserService;
             _dateTime = dateTime;
         }
         public DbSet<Attachment> Attachements { get; set; }

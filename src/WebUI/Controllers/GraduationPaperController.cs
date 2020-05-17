@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,22 +10,28 @@ using tti_graduation_work.Application.GraduationPapers.Queries.GetPaper;
 using tti_graduation_work.Application.GraduationPapers.Queries.GetPapers;
 using tti_graduation_work.Application.GraduationPapers.Queries.PaperExists;
 using tti_graduation_work.Application.Steps.Commands.CreateSteps;
+using tti_graduation_work.Application.Users.Queries.GetEntityId;
+using tti_graduation_work.WebUI.Attributes;
 using tti_graduation_work.WebUI.Enums;
+using tti_graduation_work.WebUI.Filters;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
     public class GraduationPaperController : ApiController
     {
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost]
         public async Task<ActionResult<GraduationPapersVm>> Get(GetGraduationPapersQuery request)
         {
             return await Mediator.Send(request);
         }
 
+        [RoleRequirementAttribute(UserRole.Student)]
         [HttpGet]
         public async Task<ActionResult<Application.GraduationPapers.Queries.GetPaper.GraduationPaperDto>> GetPaper()
         {
-            var studentId = 5; // TODO move to get from DB using token value
+            var userId = GetUserId();
+            var studentId = await Mediator.Send(new GetEntityIdQuery { UserId = userId });
             var paperExists = await Mediator.Send(new PaperExistsQuery { StudentId = studentId });
             if (!paperExists)
             {

@@ -14,6 +14,76 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
+export interface IAuthenticationClient {
+    login(request: AuthenticateUserCommand): Observable<UserIdentity>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class AuthenticationClient implements IAuthenticationClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    login(request: AuthenticateUserCommand): Observable<UserIdentity> {
+        let url_ = this.baseUrl + "/api/Authentication/Login";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLogin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLogin(<any>response_);
+                } catch (e) {
+                    return <Observable<UserIdentity>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UserIdentity>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processLogin(response: HttpResponseBase): Observable<UserIdentity> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserIdentity.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UserIdentity>(<any>null);
+    }
+}
+
 export interface IFacultiesClient {
     get(): Observable<FacultiesVm>;
 }
@@ -1791,6 +1861,82 @@ export class UsersClient implements IUsersClient {
     }
 }
 
+export class UserIdentity implements IUserIdentity {
+    token?: string | undefined;
+
+    constructor(data?: IUserIdentity) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.token = _data["token"];
+        }
+    }
+
+    static fromJS(data: any): UserIdentity {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserIdentity();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["token"] = this.token;
+        return data; 
+    }
+}
+
+export interface IUserIdentity {
+    token?: string | undefined;
+}
+
+export class AuthenticateUserCommand implements IAuthenticateUserCommand {
+    username?: string | undefined;
+    password?: string | undefined;
+
+    constructor(data?: IAuthenticateUserCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.username = _data["username"];
+            this.password = _data["password"];
+        }
+    }
+
+    static fromJS(data: any): AuthenticateUserCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new AuthenticateUserCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["username"] = this.username;
+        data["password"] = this.password;
+        return data; 
+    }
+}
+
+export interface IAuthenticateUserCommand {
+    username?: string | undefined;
+    password?: string | undefined;
+}
+
 export class FacultiesVm implements IFacultiesVm {
     faculties?: FacultyDto[] | undefined;
 
@@ -2933,6 +3079,7 @@ export class RejectStepCommand implements IRejectStepCommand {
     stepId?: number;
     graduationPaperId?: number;
     reason?: string | undefined;
+    deassignSupervisor?: boolean;
 
     constructor(data?: IRejectStepCommand) {
         if (data) {
@@ -2948,6 +3095,7 @@ export class RejectStepCommand implements IRejectStepCommand {
             this.stepId = _data["stepId"];
             this.graduationPaperId = _data["graduationPaperId"];
             this.reason = _data["reason"];
+            this.deassignSupervisor = _data["deassignSupervisor"];
         }
     }
 
@@ -2963,6 +3111,7 @@ export class RejectStepCommand implements IRejectStepCommand {
         data["stepId"] = this.stepId;
         data["graduationPaperId"] = this.graduationPaperId;
         data["reason"] = this.reason;
+        data["deassignSupervisor"] = this.deassignSupervisor;
         return data; 
     }
 }
@@ -2971,6 +3120,7 @@ export interface IRejectStepCommand {
     stepId?: number;
     graduationPaperId?: number;
     reason?: string | undefined;
+    deassignSupervisor?: boolean;
 }
 
 export class FinishStepCommand implements IFinishStepCommand {

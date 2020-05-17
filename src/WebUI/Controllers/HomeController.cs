@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using tti_graduation_work.Application.Users.Queries.GetProfile;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
+    [Authorize]
     public class HomeController: ApiController
     {
         [HttpPost]
