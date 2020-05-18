@@ -31,7 +31,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetSteps
         }
         public async Task<StepsVm> Handle(GetStepsQuery request, CancellationToken cancellationToken)
         {
-            var graduationPaper = await _context.GraduationPapers.FindAsync(request.GraduationPaperId);
+            var graduationPaper = await _context.GraduationPapers.Include(x => x.Supervisor).Include(x => x.Student).FirstOrDefaultAsync(x => x.Id == request.GraduationPaperId);
 
             if (graduationPaper == null)
             {

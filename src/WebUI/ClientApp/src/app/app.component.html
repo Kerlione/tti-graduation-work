@@ -1,18 +1,18 @@
 <div class="main-container">
-  <mat-toolbar color="primary">
-    <mat-toolbar-row>
-      <span>TTI</span>
-    </mat-toolbar-row>
-  </mat-toolbar>
-  <mat-sidenav-container>
-    <mat-sidenav mode="side" opened class="sidebar">
-      <app-sidenav></app-sidenav>
-    </mat-sidenav>
-    <mat-divider [vertical]="true"></mat-divider>
-    <mat-sidenav-content>
-      <div style="height: 90vh;">
-        <router-outlet></router-outlet>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+    <mat-toolbar color="primary" class="top-bar">
+        <mat-toolbar-row>
+            <span>TTI</span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-sidenav-container>
+        <mat-sidenav mode="side" opened class="sidebar">
+            <app-sidenav></app-sidenav>
+        </mat-sidenav>
+        <mat-divider [vertical]="true"></mat-divider>
+        <mat-sidenav-content>
+            <div class="side-container">
+                <router-outlet></router-outlet>
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
 </div>

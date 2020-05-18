@@ -7,3 +7,28 @@
 button {
     margin: 5px;
 }
+
+.example-card {
+    max-width: 60%;
+}
+
+.mat-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.mat-card-header {
+    flex-shrink: 0;
+}
+
+.mat-card-content {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.centered-card {
+    padding-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

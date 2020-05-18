@@ -1,0 +1,16 @@
+.full-width-table {
+    width: 100%;
+}
+
+.card-view {
+    margin: 10px;
+}
+
+.title {
+    margin: 5px;
+}
+
+.subtitle {
+    margin: 5px;
+    font-size: 12px;
+}

@@ -82,7 +82,18 @@ namespace tti_graduation_work.Infrastructure.Persistence
                         Title_RU = "Титул 1"
                     });
                 await context.SaveChangesAsync();
-            }            
+            }
+            if(!context.Users.Any(x=>x.Role == Domain.Enums.Role.Administrator))
+            {
+                context.Users.Add(
+                    new User
+                    {
+                        Role = Domain.Enums.Role.Administrator,
+                        Status = Domain.Enums.UserStatus.Active,
+                        Username = "Administrator"
+                    });
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

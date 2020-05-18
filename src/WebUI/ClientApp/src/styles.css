@@ -1,13 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
+
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 /* Provide sufficient contrast against white background */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-.sidebar{
-  width: 15%;
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-.main-container{
-  height: 100%;
+
+.sidebar {
+    width: 15%;
+}
+
+.main-container {
+    height: 100%;
+}
+
+.side-container {
+    height: 90vh;
+    max-width: 85%;
+}
+
+.top-bar {
+    height: 10vh;
 }

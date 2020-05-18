@@ -19,7 +19,7 @@ using SingleStep = tti_graduation_work.Application.Steps.Queries.GetStep.StepDto
 
 namespace tti_graduation_work.WebUI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class StepsController : ApiController
     {
         [HttpPost("NotifyStudent/{id}")]

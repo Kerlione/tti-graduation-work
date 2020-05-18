@@ -3,7 +3,7 @@
 
         <mat-form-field *ngSwitchCase="'textbox'" class="full-width">
             <mat-label>{{question.label}}</mat-label>
-            <input matInput placeholder="Input" [id]="question.key" [type]="question.type" [formControlName]="question.key">
+            <input matInput placeholder="Input" [id]="question.key" [type]="question.type" [formControlName]="question.key" [readonly]="question.readonly">
         </mat-form-field>
 
         <mat-form-field *ngSwitchCase="'dropdown'" class="full-width">
@@ -23,5 +23,5 @@
         </mat-radio-group>
     </div>
 
-    <div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>
+    <div class="errorMessage" *ngIf="!isValid && !question.readonly">{{question.label}} is required</div>
 </div>

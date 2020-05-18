@@ -203,12 +203,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/NotifySupervisor/{id}": {
@@ -253,12 +248,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Steps": {
@@ -290,12 +280,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Step/{stepId}": {
@@ -337,12 +322,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Step/{stepId}/Attachment": {
@@ -397,12 +377,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/Step/{stepId}/Update": {
@@ -447,12 +422,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Step/{stepId}/Approve": {
@@ -507,12 +477,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Step/{stepId}/Reject": {
@@ -567,12 +532,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Step/{stepId}/Finish": {
@@ -627,12 +587,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps": {
@@ -652,12 +607,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Steps/{id}/Step/{stepId}/ToReview": {
@@ -712,12 +662,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Students": {
@@ -822,12 +767,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/Create": {
@@ -860,12 +800,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/AddTopic": {
@@ -910,12 +845,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/UpdateTopic/{topicId}": {
@@ -970,12 +900,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/DeleteTopic/{topicId}": {
@@ -1030,12 +955,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/AddField": {
@@ -1080,12 +1000,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/UpdateField/{fieldId}": {
@@ -1140,12 +1055,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/DeleteField/{fieldId}": {
@@ -1200,12 +1110,39 @@
               }
             }
           }
+        }
+      }
+    },
+    "/api/Supervisors": {
+      "post": {
+        "tags": [
+          "Supervisors"
+        ],
+        "operationId": "Supervisors_GetSupervisors",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetSupervisorsQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
         },
-        "security": [
-          {
-            "JWT": []
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisorsVm2"
+                }
+              }
+            }
           }
-        ]
+        }
       }
     },
     "/api/Users/lock/{id}": {
@@ -1766,6 +1703,10 @@
           "year": {
             "type": "integer",
             "format": "int32"
+          },
+          "paperType": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -2104,14 +2045,14 @@
             "type": "array",
             "nullable": true,
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/ThesisTopicDto"
             }
           },
           "fieldsOfInterest": {
             "type": "array",
             "nullable": true,
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/FieldOfInterestDto"
             }
           },
           "faculty": {
@@ -2119,6 +2060,50 @@
             "nullable": true
           },
           "jobTitle": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ThesisTopicDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title_EN": {
+            "type": "string",
+            "nullable": true
+          },
+          "title_RU": {
+            "type": "string",
+            "nullable": true
+          },
+          "title_LV": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldOfInterestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title_EN": {
+            "type": "string",
+            "nullable": true
+          },
+          "title_RU": {
+            "type": "string",
+            "nullable": true
+          },
+          "title_LV": {
             "type": "string",
             "nullable": true
           }
@@ -2307,6 +2292,59 @@
             "format": "int32"
           },
           "fieldId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SupervisorsVm2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "supervisors": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/SupervisorDto2"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SupervisorDto2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "faculty": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "GetSupervisorsQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "take": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skip": {
             "type": "integer",
             "format": "int32"
           }

@@ -1,22 +1,32 @@
-<div style="width: 100%">
-    <form (ngSubmit)="onSubmit()" [formGroup]="form" [style.fontSize.px]="15" *ngIf="isForm">
+<div class="col-sm-12" *ngIf="stepData">
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" [style.fontSize.px]="15" *ngIf="stepDataModel.isForm">
 
-        <div *ngFor="let question of questions" class="form-row">
+        <div *ngFor="let question of stepDataModel.formData" class="form-row">
             <app-form-field [question]="question" [form]="form"></app-form-field>
         </div>
 
         <div class="form-row">
             <button mat-stroked-button type="submit" [disabled]="!form.valid">Save</button>
-            <button mat-stroked-button color="primary" [disabled]="!form.valid && stepData.stepStatus !== 4" (click)="finishStep()">Finish</button>
-            <button mat-stroked-button color="accent" [disabled]="!form.valid && stepData.stepStatus !== 2" (click)="sendToReview()">Send to Review</button>
-            <button mat-stroked-button color="warn">Cancel</button>
+            <button mat-stroked-button color="primary" [disabled]="!form.valid && stepData.stepStatus !== 3" (click)="finishStep()">Finish</button>
+            <button mat-stroked-button color="accent" [disabled]="!form.valid && stepData.stepStatus !== 1" (click)="sendToReview()">Send to Review</button>
+            <button mat-stroked-button color="warn" [routerLink]="['../..', 'details' ]">Cancel</button>
         </div>
     </form>
 
-
-    <mat-card *ngIf="!isForm">
-        <mat-card-header>
-            <mat-card-title>{{question.label}}</mat-card-title>
-        </mat-card-header>
-    </mat-card>
+    <div class="centered-card">
+        <mat-card *ngIf="!stepDataModel.isForm" class="example-card">
+            <mat-card-header>
+                <mat-card-title>{{stepDataModel.cardData.title}}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <p [innerHTML]="stepDataModel.cardData.content"></p>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-stroked-button [disabled]="stepData.stepStatus === 5 || stepData.stepStatus === 2" (click)="save()">Mark as Read</button>
+                <button mat-stroked-button color="primary" [disabled]="stepData.stepStatus !== 3" (click)="finishStep()">Finish</button>
+                <button mat-stroked-button color="accent" [disabled]="stepData.stepStatus !== 1" (click)="sendToReview()">Send to Review</button>
+                <button mat-stroked-button color="warn" [routerLink]="['../..', 'details' ]">Cancel</button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
 </div>

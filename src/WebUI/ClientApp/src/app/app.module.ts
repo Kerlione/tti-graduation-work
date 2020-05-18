@@ -33,17 +33,24 @@ import { StepFormComponent } from './core/graduation-papers/step-form/step-form.
 import { FormFieldComponent } from './core/graduation-papers/step-form/form-field/form-field.component';
 import { RejectDialogComponent } from './core/graduation-papers/graduation-papers-details/reject-dialog/reject-dialog.component';
 import { LoginComponent } from './common/login/login.component';
+import { SupervisorsTableComponent } from './core/supervisors/supervisors-table/supervisors-table.component';
+import { SupervisorDetailsComponent } from './core/supervisors/supervisor-details/supervisor-details.component';
+import { AddDialogComponent } from './core/supervisors/supervisor-details/dialogs/add-dialog/add-dialog.component';
+import { EditDialogComponent } from './core/supervisors/supervisor-details/dialogs/edit-dialog/edit-dialog.component';
+import { DeleteDialogComponent } from './core/supervisors/supervisor-details/dialogs/delete-dialog/delete-dialog.component';
 
 
 const appRoutes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: '/home' },
+  { path: '', pathMatch: 'full', redirectTo: '/login' },
   { path: 'login', pathMatch: 'full', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'view/graduation-papers', component: GraduationPapersTableComponent },
   { path: 'view/graduation-papers/:id/details', component: GraduationPapersDetailsComponent },
   { path: 'view/graduation-papers/:id/step/:stepId', component: StepFormComponent },
   { path: 'graduation-paper/start', component: StepFormComponent },
-  { path: 'view/students', component: StudentsTableComponent }
+  { path: 'view/students', component: StudentsTableComponent },
+  { path: 'view/supervisors', component: SupervisorsTableComponent },
+  { path: 'view/supervisors/:id/details', component: SupervisorDetailsComponent }
 ]
 
 @NgModule({
@@ -57,7 +64,12 @@ const appRoutes: Routes = [
     StepFormComponent,
     FormFieldComponent,
     RejectDialogComponent,
-    LoginComponent
+    LoginComponent,
+    SupervisorsTableComponent,
+    SupervisorDetailsComponent,
+    AddDialogComponent,
+    EditDialogComponent,
+    DeleteDialogComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -84,7 +96,8 @@ const appRoutes: Routes = [
     MatTabsModule,
     MatSelectModule,
     MatRadioModule,
-    MatDialogModule
+    MatDialogModule,
+    MatCardModule
   ],
   bootstrap: [AppComponent],
   providers: [

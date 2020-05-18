@@ -13,6 +13,6 @@ export class RejectDialogComponent  {
     @Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   onNoClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(-1);
   }
 }

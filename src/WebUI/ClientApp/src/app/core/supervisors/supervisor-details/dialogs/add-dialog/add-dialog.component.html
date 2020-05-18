@@ -1,0 +1,31 @@
+<div class="container">
+    <h3 mat-dialog-title>Add new {{data.type}}</h3>
+
+    <form class="mat-dialog-content" (ngSubmit)="submit" #formControl="ngForm">
+        <div class="form">
+            <mat-form-field color="accent">
+                <textarea matInput #input class="form-control" placeholder="Title EN" [(ngModel)]="data.titleEn" name="titleEn" required></textarea>
+                <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form">
+            <mat-form-field color="accent">
+                <textarea matInput #input class="form-control" placeholder="Title LV" [(ngModel)]="data.titleLv" name="titleLv" required></textarea>
+                <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form">
+            <mat-form-field color="accent">
+                <textarea matInput #input class="form-control" placeholder="Title RU" [(ngModel)]="data.titleRu" name="titleRu" required></textarea>
+                <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div mat-dialog-actions>
+            <button mat-button [type]="submit" [disabled]="!formControl.valid" [mat-dialog-close]="1" (click)="confirmAdd()">Save</button>
+            <button mat-button (click)="onNoClick()" tabindex="-1">Cancel</button>
+        </div>
+    </form>
+</div>

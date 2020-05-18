@@ -45,28 +45,31 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.paperId = +params['id'];
+      this.getSteps();
 
-      this.stepsClient.getSteps(this.paperId).subscribe(
-        result => {
-          if (result.steps.length) {
-            this.dataSource = result.steps;
-            this.stepStatuses = result.statuses;
-            this.stepTypes = result.types;
-            this.tableDs = new MatTableDataSource(this.dataSource);
-            this.isDataLoading = false;
-            this.tableDs.sort = this.sort;
-            this.tableDs.dataSource = this.dataSource;
-            this.graduationPaper = result.graduationPaper;
-          }
-        },
-        error => {
-          this.notificationService.error(error);
-          this.isDataLoading = false;
-        });
     });
 
   }
-
+  private getSteps() {
+    this.stepsClient.getSteps(this.paperId).subscribe(
+      result => {
+        if (result.steps.length) {
+          this.dataSource = result.steps;
+          this.stepStatuses = result.statuses;
+          this.stepTypes = result.types;
+          this.tableDs = new MatTableDataSource(this.dataSource);
+          this.isDataLoading = false;
+          this.tableDs.sort = this.sort;
+          this.tableDs.dataSource = this.dataSource;
+          this.graduationPaper = result.graduationPaper;
+          console.log(this.graduationPaper);
+        }
+      },
+      error => {
+        this.notificationService.error(error);
+        this.isDataLoading = false;
+      });
+  }
   ngAfterViewInit() {
   }
 
@@ -106,6 +109,7 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
       })).subscribe(
         result => {
           this.notificationService.success('Approved');
+          this.getSteps();
         },
         error => {
           this.notificationService.error(error);
@@ -122,15 +126,17 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
-      console.log(comment);
-      this.stepsClient.rejectStep(this.paperId, stepId,
-        RejectStepCommand.fromJS({ stepId: stepId, graduationPaperId: this.paperId, reason: result }))
-        .subscribe(result => {
-          this.notificationService.success('Rejected');
-        },
-          error => {
-            this.notificationService.error(error);
-          });
+      if (result !== -1) {
+        this.stepsClient.rejectStep(this.paperId, stepId,
+          RejectStepCommand.fromJS({ stepId: stepId, graduationPaperId: this.paperId, reason: result }))
+          .subscribe(res => {
+            this.notificationService.success('Rejected');
+            this.getSteps();
+          },
+            error => {
+              this.notificationService.error(error);
+            });
+      }
     });
   }
 
@@ -146,7 +152,7 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
     let row: StepDto = this.dataSource[id];
     if (this.dataSource[id - 1]) {
       if (this.dataSource[id - 1].stepStatus === 5) {
-        if (row.stepStatus === 0 || row.stepStatus === 1 || row.stepStatus === 4) {
+        if (row.stepStatus !== 2) {
           return true;
         } else {
           return false;

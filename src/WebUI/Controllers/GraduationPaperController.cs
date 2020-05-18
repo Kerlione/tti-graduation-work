@@ -19,7 +19,7 @@ namespace tti_graduation_work.WebUI.Controllers
 {
     public class GraduationPaperController : ApiController
     {
-        [RoleRequirementAttribute(UserRole.Supervisor)]
+        //[RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost]
         public async Task<ActionResult<GraduationPapersVm>> Get(GetGraduationPapersQuery request)
         {

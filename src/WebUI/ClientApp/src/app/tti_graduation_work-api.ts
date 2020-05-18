@@ -1134,6 +1134,7 @@ export interface ISupervisorsClient {
     addField(id: number, request: CreateFieldCommand): Observable<number>;
     updateField(id: number, fieldId: number, request: UpdateFieldCommand): Observable<FileResponse>;
     deleteField(id: number, fieldId: number, request: DeleteFieldCommand): Observable<FileResponse>;
+    getSupervisors(request: GetSupervisorsQuery): Observable<SupervisorsVm2>;
 }
 
 @Injectable({
@@ -1588,6 +1589,58 @@ export class SupervisorsClient implements ISupervisorsClient {
             }));
         }
         return _observableOf<FileResponse>(<any>null);
+    }
+
+    getSupervisors(request: GetSupervisorsQuery): Observable<SupervisorsVm2> {
+        let url_ = this.baseUrl + "/api/Supervisors";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSupervisors(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSupervisors(<any>response_);
+                } catch (e) {
+                    return <Observable<SupervisorsVm2>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<SupervisorsVm2>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetSupervisors(response: HttpResponseBase): Observable<SupervisorsVm2> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SupervisorsVm2.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<SupervisorsVm2>(<any>null);
     }
 }
 
@@ -2789,6 +2842,7 @@ export class GraduationPaperDto3 implements IGraduationPaperDto3 {
     supervisor?: string | undefined;
     supervisorId?: number;
     year?: number;
+    paperType?: string | undefined;
 
     constructor(data?: IGraduationPaperDto3) {
         if (data) {
@@ -2806,6 +2860,7 @@ export class GraduationPaperDto3 implements IGraduationPaperDto3 {
             this.supervisor = _data["supervisor"];
             this.supervisorId = _data["supervisorId"];
             this.year = _data["year"];
+            this.paperType = _data["paperType"];
         }
     }
 
@@ -2823,6 +2878,7 @@ export class GraduationPaperDto3 implements IGraduationPaperDto3 {
         data["supervisor"] = this.supervisor;
         data["supervisorId"] = this.supervisorId;
         data["year"] = this.year;
+        data["paperType"] = this.paperType;
         return data; 
     }
 }
@@ -2833,6 +2889,7 @@ export interface IGraduationPaperDto3 {
     supervisor?: string | undefined;
     supervisorId?: number;
     year?: number;
+    paperType?: string | undefined;
 }
 
 export class StepDto2 implements IStepDto2 {
@@ -3506,8 +3563,8 @@ export class SupervisorDto implements ISupervisorDto {
     languages?: string[] | undefined;
     phone?: string | undefined;
     email?: string | undefined;
-    topics?: string[] | undefined;
-    fieldsOfInterest?: string[] | undefined;
+    topics?: ThesisTopicDto[] | undefined;
+    fieldsOfInterest?: FieldOfInterestDto[] | undefined;
     faculty?: string | undefined;
     jobTitle?: string | undefined;
 
@@ -3535,12 +3592,12 @@ export class SupervisorDto implements ISupervisorDto {
             if (Array.isArray(_data["topics"])) {
                 this.topics = [] as any;
                 for (let item of _data["topics"])
-                    this.topics!.push(item);
+                    this.topics!.push(ThesisTopicDto.fromJS(item));
             }
             if (Array.isArray(_data["fieldsOfInterest"])) {
                 this.fieldsOfInterest = [] as any;
                 for (let item of _data["fieldsOfInterest"])
-                    this.fieldsOfInterest!.push(item);
+                    this.fieldsOfInterest!.push(FieldOfInterestDto.fromJS(item));
             }
             this.faculty = _data["faculty"];
             this.jobTitle = _data["jobTitle"];
@@ -3569,12 +3626,12 @@ export class SupervisorDto implements ISupervisorDto {
         if (Array.isArray(this.topics)) {
             data["topics"] = [];
             for (let item of this.topics)
-                data["topics"].push(item);
+                data["topics"].push(item.toJSON());
         }
         if (Array.isArray(this.fieldsOfInterest)) {
             data["fieldsOfInterest"] = [];
             for (let item of this.fieldsOfInterest)
-                data["fieldsOfInterest"].push(item);
+                data["fieldsOfInterest"].push(item.toJSON());
         }
         data["faculty"] = this.faculty;
         data["jobTitle"] = this.jobTitle;
@@ -3589,10 +3646,106 @@ export interface ISupervisorDto {
     languages?: string[] | undefined;
     phone?: string | undefined;
     email?: string | undefined;
-    topics?: string[] | undefined;
-    fieldsOfInterest?: string[] | undefined;
+    topics?: ThesisTopicDto[] | undefined;
+    fieldsOfInterest?: FieldOfInterestDto[] | undefined;
     faculty?: string | undefined;
     jobTitle?: string | undefined;
+}
+
+export class ThesisTopicDto implements IThesisTopicDto {
+    id?: number;
+    title_EN?: string | undefined;
+    title_RU?: string | undefined;
+    title_LV?: string | undefined;
+
+    constructor(data?: IThesisTopicDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title_EN = _data["title_EN"];
+            this.title_RU = _data["title_RU"];
+            this.title_LV = _data["title_LV"];
+        }
+    }
+
+    static fromJS(data: any): ThesisTopicDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThesisTopicDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title_EN"] = this.title_EN;
+        data["title_RU"] = this.title_RU;
+        data["title_LV"] = this.title_LV;
+        return data; 
+    }
+}
+
+export interface IThesisTopicDto {
+    id?: number;
+    title_EN?: string | undefined;
+    title_RU?: string | undefined;
+    title_LV?: string | undefined;
+}
+
+export class FieldOfInterestDto implements IFieldOfInterestDto {
+    id?: number;
+    title_EN?: string | undefined;
+    title_RU?: string | undefined;
+    title_LV?: string | undefined;
+
+    constructor(data?: IFieldOfInterestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title_EN = _data["title_EN"];
+            this.title_RU = _data["title_RU"];
+            this.title_LV = _data["title_LV"];
+        }
+    }
+
+    static fromJS(data: any): FieldOfInterestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldOfInterestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title_EN"] = this.title_EN;
+        data["title_RU"] = this.title_RU;
+        data["title_LV"] = this.title_LV;
+        return data; 
+    }
+}
+
+export interface IFieldOfInterestDto {
+    id?: number;
+    title_EN?: string | undefined;
+    title_RU?: string | undefined;
+    title_LV?: string | undefined;
 }
 
 export class GetSupervisorQuery implements IGetSupervisorQuery {
@@ -3993,6 +4146,142 @@ export class DeleteFieldCommand implements IDeleteFieldCommand {
 export interface IDeleteFieldCommand {
     supervisorId?: number;
     fieldId?: number;
+}
+
+export class SupervisorsVm2 implements ISupervisorsVm2 {
+    supervisors?: SupervisorDto2[] | undefined;
+    total?: number;
+
+    constructor(data?: ISupervisorsVm2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["supervisors"])) {
+                this.supervisors = [] as any;
+                for (let item of _data["supervisors"])
+                    this.supervisors!.push(SupervisorDto2.fromJS(item));
+            }
+            this.total = _data["total"];
+        }
+    }
+
+    static fromJS(data: any): SupervisorsVm2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupervisorsVm2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.supervisors)) {
+            data["supervisors"] = [];
+            for (let item of this.supervisors)
+                data["supervisors"].push(item.toJSON());
+        }
+        data["total"] = this.total;
+        return data; 
+    }
+}
+
+export interface ISupervisorsVm2 {
+    supervisors?: SupervisorDto2[] | undefined;
+    total?: number;
+}
+
+export class SupervisorDto2 implements ISupervisorDto2 {
+    id?: number;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    faculty?: string | undefined;
+
+    constructor(data?: ISupervisorDto2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.faculty = _data["faculty"];
+        }
+    }
+
+    static fromJS(data: any): SupervisorDto2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupervisorDto2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["faculty"] = this.faculty;
+        return data; 
+    }
+}
+
+export interface ISupervisorDto2 {
+    id?: number;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    faculty?: string | undefined;
+}
+
+export class GetSupervisorsQuery implements IGetSupervisorsQuery {
+    take?: number;
+    skip?: number;
+
+    constructor(data?: IGetSupervisorsQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.take = _data["take"];
+            this.skip = _data["skip"];
+        }
+    }
+
+    static fromJS(data: any): GetSupervisorsQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetSupervisorsQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["take"] = this.take;
+        data["skip"] = this.skip;
+        return data; 
+    }
+}
+
+export interface IGetSupervisorsQuery {
+    take?: number;
+    skip?: number;
 }
 
 export class LockUserCommand implements ILockUserCommand {

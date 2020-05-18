@@ -12,11 +12,13 @@ import {
   PaperStatusDto
 } from 'src/app/tti_graduation_work-api';
 import { MatButton } from '@angular/material/button';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-graduation-papers-table',
   templateUrl: './graduation-papers-table.component.html',
-  styleUrls: ['./graduation-papers-table.component.css']
+  styleUrls: ['./graduation-papers-table.component.css'],
+  providers: [NotificationService]
 })
 export class GraduationPapersTableComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -34,7 +36,8 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['title', 'supervisor', 'student', 'paperStatus', 'paperType', 'actions'];
-  constructor(private graduationPapersClient: GraduationPaperClient, private _snackBar: MatSnackBar) {
+  constructor(private graduationPapersClient: GraduationPaperClient,
+    private notificationService: NotificationService) {
     this.graduationPapersClient = graduationPapersClient;
   }
   query: GetGraduationPapersQuery;
@@ -60,6 +63,7 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
         }
       },
       error => {
+        this.notificationService.error(error);
         console.error(error);
         this.isDataLoading = false;
       });
@@ -103,7 +107,5 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
   }
 
   public openDetails(id: number) {
-    console.log(id);
-    this._snackBar.open("Hello");
   }
 }

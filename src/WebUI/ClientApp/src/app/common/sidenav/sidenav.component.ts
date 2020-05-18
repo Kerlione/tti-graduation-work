@@ -28,6 +28,10 @@ export class SidenavComponent implements OnInit {
     {
       name: 'Graduation Paper',
       path: '/graduation-paper/start'
+    },
+    {
+      name: 'Supervisors',
+      path: '/view/supervisors'
     }
   ]
 

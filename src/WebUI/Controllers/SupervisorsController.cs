@@ -9,20 +9,22 @@ using tti_graduation_work.Application.Fields.Commands.DeleteField;
 using tti_graduation_work.Application.Fields.Commands.UpdateField;
 using tti_graduation_work.Application.Supervisors.Commands.CreateSupervisor;
 using tti_graduation_work.Application.Supervisors.Queries.GetSupervisor;
+using tti_graduation_work.Application.Supervisors.Queries.GetSupervisors;
 using tti_graduation_work.Application.Topics.Commands.CreateTopic;
 using tti_graduation_work.Application.Topics.Commands.DeleteTopic;
 using tti_graduation_work.Application.Topics.Commands.UpdateTopic;
 using tti_graduation_work.Application.Users.Commands.CreateUser;
 using tti_graduation_work.Application.Users.Queries.GetUser;
 using tti_graduation_work.WebUI.Enums;
+using SingleSupervisor = tti_graduation_work.Application.Supervisors.Queries.GetSupervisor.SupervisorDto;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class SupervisorsController : ApiController
     {
         [HttpPost("{id}/Profile")]
-        public async Task<ActionResult<SupervisorDto>> GetProfile(int id, GetSupervisorQuery request)
+        public async Task<ActionResult<SingleSupervisor>> GetProfile(int id, GetSupervisorQuery request)
         {
             if (id != request.Id)
             {
@@ -141,6 +143,12 @@ namespace tti_graduation_work.WebUI.Controllers
             await Mediator.Send(request);
 
             return Ok();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<SupervisorsVm>> GetSupervisors(GetSupervisorsQuery request)
+        {
+            return await Mediator.Send(request);
         }
     }
 }
