@@ -36,66 +36,28 @@ namespace tti_graduation_work.Application.Users.Queries.GetProfile
                 throw new NotFoundException($"User {request.Username} not found");
             }
 
-            ProfileVm profileData = new ProfileVm();
-
             switch (user.Role)
             {
                 case Domain.Enums.Role.Student:
                     {
-                        var entity = await _context.Students.FirstOrDefaultAsync(x => x.UserId == user.Id);
-                        profileData = new ProfileVm
-                        {
-                            Emails = new List<string>()
-                            {
-                                entity.Email1,
-                                entity.Email2
-                            },
-                            PhoneNumbers = new List<string>()
-                            {
-                                entity.Phone1,
-                                entity.Phone2
-                            },
-                            Faculty = entity.Programe.Faculty.Title_EN,
-                            FirstName = entity.Name,
-                            LastName = entity.Surname,
-                            Programe = entity.Programe.Title_EN
-                        };
-                        break;
+                        var entity = await _context.Students.Include(s => s.User).Include(s => s.Programe).ThenInclude(p => p.Faculty).FirstOrDefaultAsync(x => x.UserId == user.Id);
+                        return _mapper.Map<ProfileVm>(entity);
                     }
                 case Domain.Enums.Role.Supervisor:
                     {
-                        var entity = await _context.Supervisors.FirstOrDefaultAsync(x => x.UserId == user.Id);
-                        profileData = new ProfileVm
-                        {
-                            Emails = new List<string>()
-                            {
-                                entity.Email
-                            },
-                            PhoneNumbers = new List<string>()
-                            {
-                                entity.Phone
-                            },
-                            Faculty = entity.Faculty.Title_EN,
-                            FirstName = entity.Name,
-                            LastName = entity.Surname
-                        };
-                        break;
+                        var entity = await _context.Supervisors.Include(s => s.User).Include(s => s.Faculty).FirstOrDefaultAsync(x => x.UserId == user.Id);
+                        return _mapper.Map<ProfileVm>(entity);
+
                     }
                 case Domain.Enums.Role.Administrator:
                     {
-                        profileData = new ProfileVm
-                        {
-                            FirstName = user.Username
-                        };
-                        break;
+                        return _mapper.Map<ProfileVm>(user);
                     }
                 default:
                     {
                         throw new NotSupportedException($"Role with id {(int)user.Role} is not supported");
                     }
             }
-
-            return profileData;
         }
     }
 }

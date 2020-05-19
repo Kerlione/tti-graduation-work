@@ -74,9 +74,9 @@ namespace tti_graduation_work.Application.Steps.Commands.SendStepToReviewRequest
         {
             var step = _context.Steps.Find(request.StepId);
 
-            if (step.StepStatus != StepStatus.Approved)
+            if (step.StepStatus != StepStatus.InProgress)
             {
-                throw new NotSupportedException($"Step status is not correct for Paper data update");
+                throw new NotSupportedException($"Step status is not correct for attaching supervisor");
             }
 
             var paper = _context.GraduationPapers.Find(request.GraduationPaperId);
@@ -86,6 +86,7 @@ namespace tti_graduation_work.Application.Steps.Commands.SendStepToReviewRequest
             paper.Title_EN = updatedData.Title_EN;
             paper.Title_RU = updatedData.Title_RU;
             paper.Title_LV = updatedData.Title_LV;
+            paper.PaperType = updatedData.PaperType;
 
             var supervisor = _context.Supervisors.Include(s => s.GraduationPapers).FirstOrDefault(x => x.Id == updatedData.SupervisorId);
 

@@ -11,7 +11,7 @@ namespace tti_graduation_work.WebUI.Controllers
 {
     public class UsersController : ApiController
     {
-        [HttpPut("lock/{id}")]
+        [HttpPut("{id}/Lock")]
         public async Task<ActionResult> Lock(int id, LockUserCommand command)
         {
             if (id != command.Id)
@@ -24,7 +24,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
-        [HttpPut("unlock/{id}")]
+        [HttpPut("{id}/Unlock")]
         public async Task<ActionResult> Unlock(int id, UnlockUserCommand command)
         {
             if (id != command.Id)
@@ -45,16 +45,16 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<ActionResult> Create()
         {
             return NoContent();
         }
 
-        [HttpGet]
-        public async Task<ActionResult<UsersVm>> Get()
+        [HttpPost]
+        public async Task<ActionResult<UsersVm>> GetUsers(GetUsersQuery request)
         {
-            return await Mediator.Send(new GetUsersQuery());
+            return await Mediator.Send(request);
         }
     }
 }

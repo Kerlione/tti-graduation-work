@@ -1,0 +1,32 @@
+.loader-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(90vh - 20px);
+}
+
+.loader {
+    padding: 12px;
+}
+
+mat-card-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.cardbody {
+    height: 20%;
+    overflow-y: auto;
+    margin: 0 -15px;
+    padding: 10px;
+}
+
+.singleNews {
+    margin: 10px 0px;
+    width: 75%;
+}
+
+mat-card {
+    margin: 2em auto;
+    text-align: center;
+}

@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 /* Provide sufficient contrast against white background */
 
@@ -18,10 +19,15 @@ body {
 }
 
 .side-container {
-    height: 90vh;
-    max-width: 85%;
+    height: 92vh;
+    max-width: 95%;
 }
 
 .top-bar {
-    height: 10vh;
+    height: 5vh;
+}
+
+.logo {
+    width: 32px;
+    height: 32px;
 }

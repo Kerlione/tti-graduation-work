@@ -16,6 +16,8 @@ namespace tti_graduation_work.Application.Users.Queries.GetUsers
 
     public class GetUsersQuery : IRequest<UsersVm>
     {
+        public int Take { get; set; }
+        public int Skip { get; set; }
     }
 
     public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, UsersVm>
@@ -40,7 +42,7 @@ namespace tti_graduation_work.Application.Users.Queries.GetUsers
                 .Cast<UserStatus>()
                 .Select(r => new StatusDto { Value = (int)r, Name = r.ToString() })
                 .ToList(),
-                Users = await _context.Users
+                Users = await _context.Users.Take(request.Take).Skip(request.Skip)
                 .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
                 .OrderBy(u => u.Username)
                 .ToListAsync(cancellationToken)

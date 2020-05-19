@@ -15,6 +15,12 @@ namespace tti_graduation_work.Infrastructure.Persistence.Configurations
                 .HasMany(s => s.Attachments)
                 .WithOne(a => a.Step);
 
+            builder.Property(s => s.StepData)
+                .HasMaxLength(65536);
+
+            builder.Property(s => s.Comment)
+                .HasMaxLength(2048);
+
             builder
                 .HasOne(s => s.GraduationPaper)
                 .WithMany(g => g.Steps);

@@ -21,6 +21,26 @@ namespace tti_graduation_work.Infrastructure.Persistence.Configurations
                 .HasMaxLength(256);
 
             builder
+                .Property(s => s.Phone1)
+                .HasMaxLength(50);
+
+            builder
+                .Property(s => s.Phone2)
+                .HasMaxLength(50);
+
+            builder
+                .Property(s => s.Email1)
+                .HasMaxLength(255);
+
+            builder
+                .Property(s => s.Email2)
+                .HasMaxLength(255);
+
+            builder
+                .Property(s => s.Comment)
+                .HasMaxLength(255);
+
+            builder
                 .HasOne(s => s.Programe);
             builder
                 .HasOne(s => s.User);

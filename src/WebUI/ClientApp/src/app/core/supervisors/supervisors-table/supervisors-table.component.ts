@@ -83,7 +83,6 @@ export class SupervisorsTableComponent implements AfterViewInit, OnInit {
         console.error(error);
         this.isDataLoading = false;
       });
-    console.log(this.dataSource);
     return event;
   }
 }

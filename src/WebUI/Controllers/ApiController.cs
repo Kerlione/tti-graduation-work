@@ -24,9 +24,22 @@ namespace tti_graduation_work.WebUI.Controllers
         {
             return User.IsInRole(role.ToString());
         }
-        protected int GetUserId()
+        /// <summary>
+        /// NameIdentifier contains the ID of Student or Supervisor entities (for Admin, the UserID will be returned)
+        /// </summary>
+        /// <returns>Entity ID</returns>
+        protected int GetEntityId()
         {
             return Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+        }
+
+        /// <summary>
+        /// Get Username from Identity token
+        /// </summary>
+        /// <returns>Authenticated user's Name claim value</returns>
+        protected string GetUsername()
+        {
+            return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
         }
     }
 }

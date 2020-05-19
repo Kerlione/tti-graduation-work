@@ -8,6 +8,7 @@ using tti_graduation_work.Application.Fields.Commands.CreateField;
 using tti_graduation_work.Application.Fields.Commands.DeleteField;
 using tti_graduation_work.Application.Fields.Commands.UpdateField;
 using tti_graduation_work.Application.Supervisors.Commands.CreateSupervisor;
+using tti_graduation_work.Application.Supervisors.Commands.UpdateStudentCount;
 using tti_graduation_work.Application.Supervisors.Queries.GetSupervisor;
 using tti_graduation_work.Application.Supervisors.Queries.GetSupervisors;
 using tti_graduation_work.Application.Topics.Commands.CreateTopic;
@@ -37,11 +38,11 @@ namespace tti_graduation_work.WebUI.Controllers
         [HttpPut("Create")]
         public async Task<ActionResult<int>> Create(CreateSupervisorCommand request)
         {
-            var username = $"St{request.StaffId}";
+            var username = $"{request.Email.Split('@', 2)[0]}";
             var user = await Mediator.Send(new GetUserQuery { Username = username });
             if (user == null)
             {
-                request.UserId = await Mediator.Send(new CreateUserCommand { Role = (int)UserRole.Supervisor, Username = username });
+                request.UserId = await Mediator.Send(new CreateUserCommand { Role = (int)UserRole.Supervisor, Username = username, Password = "P@ssw0rd" });
             }
             else
             {
@@ -149,6 +150,19 @@ namespace tti_graduation_work.WebUI.Controllers
         public async Task<ActionResult<SupervisorsVm>> GetSupervisors(GetSupervisorsQuery request)
         {
             return await Mediator.Send(request);
+        }
+
+        [HttpPost("{id}/UpdateLimit")]
+        public async Task<ActionResult> UpdateStudentLimit(int id, UpdateStudentLimitCommand request)
+        {
+            if(id != request.SupervisorId)
+            {
+                return BadRequest();
+            }
+
+            await Mediator.Send(request);
+
+            return Ok();
         }
     }
 }

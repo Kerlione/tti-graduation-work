@@ -18,6 +18,12 @@ namespace tti_graduation_work.Infrastructure.Persistence.Configurations
                 .Property(s => s.Name).HasMaxLength(256);
             builder
                 .Property(s => s.Surname).HasMaxLength(256);
+            builder
+                .Property(s => s.Email).HasMaxLength(255);
+            builder
+                .Property(s => s.Phone).HasMaxLength(50);
+            builder
+                .Property(s => s.Degree).HasMaxLength(255);
 
             builder
                 .HasOne(s => s.User);

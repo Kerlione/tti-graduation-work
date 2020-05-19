@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using tti_graduation_work.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using tti_graduation_work.Infrastructure.NewsFeed;
 
 namespace tti_graduation_work.Infrastructure
 {
@@ -39,6 +40,10 @@ namespace tti_graduation_work.Infrastructure
             services.AddTransient<INotificationService, NotificationService>();
 
             services.AddTransient<IAuthRepository, AuthRepository>();
+
+            services.AddTransient<IPasswordHasher, PasswordHasher>();
+
+            services.AddTransient<INewsFeedService, NewsFeedService>();
 
             return services;
         }

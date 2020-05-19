@@ -13,20 +13,31 @@ namespace tti_graduation_work.Infrastructure.Identity
     public class AuthRepository : IAuthRepository
     {
         private readonly IConfiguration _configuration;
-        private IApplicationDbContext _context;
 
         public AuthRepository(IConfiguration configuration, IApplicationDbContext context)
         {
             _configuration = configuration;
-            _context = context;
         }
 
-        public string CreateToken(User user)
+        /// <summary>
+        /// Create a token for user
+        /// </summary>
+        /// <param name="profile">User data and profile info</param>
+        /// <returns>JWT Token with following claims:
+        /// NameIdentifier - EntityId (except Administrator - UserId)
+        /// Name - Username
+        /// Role - role name
+        /// GivenName - First Name + Last Name (user Username for Administrator)
+        /// Sid - UserId
+        /// </returns>
+        public string CreateToken(IProfileData profile)
         {
             var claims = new List<Claim> {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.NameIdentifier, profile.ProfileId.ToString()),
+                new Claim(ClaimTypes.Name, profile.User.Username),
+                new Claim(ClaimTypes.Role, profile.User.Role.ToString()),
+                new Claim(ClaimTypes.GivenName, profile.GivenName),
+                new Claim(ClaimTypes.Sid, profile.User.Id.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));

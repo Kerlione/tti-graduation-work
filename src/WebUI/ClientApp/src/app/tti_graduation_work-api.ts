@@ -389,7 +389,7 @@ export interface IStepsClient {
     notifySupervisor(id: number, request: NotifySupervisorCommand): Observable<FileResponse>;
     getSteps(id: number): Observable<StepsVm>;
     getStep(id: number, stepId: number): Observable<StepDto2>;
-    uploadAttachment(id: number, stepId: number, request: UploadAttachmentCommand): Observable<number>;
+    uploadAttachment(id: number, stepId: number, file: FileParameter | null | undefined): Observable<number>;
     updateStep(stepId: number, request: UpdateStepCommand): Observable<FileResponse>;
     approveStep(id: number, stepId: number, request: ApproveStepCommand): Observable<FileResponse>;
     rejectStep(id: number, stepId: number, request: RejectStepCommand): Observable<FileResponse>;
@@ -622,7 +622,7 @@ export class StepsClient implements IStepsClient {
         return _observableOf<StepDto2>(<any>null);
     }
 
-    uploadAttachment(id: number, stepId: number, request: UploadAttachmentCommand): Observable<number> {
+    uploadAttachment(id: number, stepId: number, file: FileParameter | null | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/Steps/{id}/Step/{stepId}/Attachment";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -632,19 +632,20 @@ export class StepsClient implements IStepsClient {
         url_ = url_.replace("{stepId}", encodeURIComponent("" + stepId)); 
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(request);
+        const content_ = new FormData();
+        if (file !== null && file !== undefined)
+            content_.append("file", file.data, file.fileName ? file.fileName : "file");
 
         let options_ : any = {
             body: content_,
             observe: "response",
             responseType: "blob",			
             headers: new HttpHeaders({
-                "Content-Type": "application/json", 
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processUploadAttachment(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -1135,6 +1136,7 @@ export interface ISupervisorsClient {
     updateField(id: number, fieldId: number, request: UpdateFieldCommand): Observable<FileResponse>;
     deleteField(id: number, fieldId: number, request: DeleteFieldCommand): Observable<FileResponse>;
     getSupervisors(request: GetSupervisorsQuery): Observable<SupervisorsVm2>;
+    updateStudentLimit(id: number, request: UpdateStudentLimitCommand): Observable<FileResponse>;
 }
 
 @Injectable({
@@ -1642,6 +1644,59 @@ export class SupervisorsClient implements ISupervisorsClient {
         }
         return _observableOf<SupervisorsVm2>(<any>null);
     }
+
+    updateStudentLimit(id: number, request: UpdateStudentLimitCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Supervisors/{id}/UpdateLimit";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateStudentLimit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateStudentLimit(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateStudentLimit(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
 }
 
 export interface IUsersClient {
@@ -1649,7 +1704,7 @@ export interface IUsersClient {
     unlock(id: number, command: UnlockUserCommand): Observable<FileResponse>;
     sync(): Observable<number>;
     create(): Observable<FileResponse>;
-    get(): Observable<UsersVm>;
+    getUsers(request: GetUsersQuery): Observable<UsersVm>;
 }
 
 @Injectable({
@@ -1666,7 +1721,7 @@ export class UsersClient implements IUsersClient {
     }
 
     lock(id: number, command: LockUserCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Users/lock/{id}";
+        let url_ = this.baseUrl + "/api/Users/{id}/Lock";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -1719,7 +1774,7 @@ export class UsersClient implements IUsersClient {
     }
 
     unlock(id: number, command: UnlockUserCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Users/unlock/{id}";
+        let url_ = this.baseUrl + "/api/Users/{id}/Unlock";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -1820,7 +1875,7 @@ export class UsersClient implements IUsersClient {
     }
 
     create(): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Users";
+        let url_ = this.baseUrl + "/api/Users/Create";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1865,24 +1920,28 @@ export class UsersClient implements IUsersClient {
         return _observableOf<FileResponse>(<any>null);
     }
 
-    get(): Observable<UsersVm> {
+    getUsers(request: GetUsersQuery): Observable<UsersVm> {
         let url_ = this.baseUrl + "/api/Users";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(request);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",			
             headers: new HttpHeaders({
+                "Content-Type": "application/json", 
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUsers(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGet(<any>response_);
+                    return this.processGetUsers(<any>response_);
                 } catch (e) {
                     return <Observable<UsersVm>><any>_observableThrow(e);
                 }
@@ -1891,7 +1950,7 @@ export class UsersClient implements IUsersClient {
         }));
     }
 
-    protected processGet(response: HttpResponseBase): Observable<UsersVm> {
+    protected processGetUsers(response: HttpResponseBase): Observable<UsersVm> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -2317,6 +2376,8 @@ export class GraduationPaperDto implements IGraduationPaperDto {
     student?: string | undefined;
     paperStatus?: number;
     paperType?: number;
+    finishedStepCount?: number;
+    totalStepCount?: number;
 
     constructor(data?: IGraduationPaperDto) {
         if (data) {
@@ -2335,6 +2396,8 @@ export class GraduationPaperDto implements IGraduationPaperDto {
             this.student = _data["student"];
             this.paperStatus = _data["paperStatus"];
             this.paperType = _data["paperType"];
+            this.finishedStepCount = _data["finishedStepCount"];
+            this.totalStepCount = _data["totalStepCount"];
         }
     }
 
@@ -2353,6 +2416,8 @@ export class GraduationPaperDto implements IGraduationPaperDto {
         data["student"] = this.student;
         data["paperStatus"] = this.paperStatus;
         data["paperType"] = this.paperType;
+        data["finishedStepCount"] = this.finishedStepCount;
+        data["totalStepCount"] = this.totalStepCount;
         return data; 
     }
 }
@@ -2364,6 +2429,8 @@ export interface IGraduationPaperDto {
     student?: string | undefined;
     paperStatus?: number;
     paperType?: number;
+    finishedStepCount?: number;
+    totalStepCount?: number;
 }
 
 export class GetGraduationPapersQuery implements IGetGraduationPapersQuery {
@@ -2465,6 +2532,7 @@ export class ProfileVm implements IProfileVm {
     phoneNumbers?: string[] | undefined;
     faculty?: string | undefined;
     programe?: string | undefined;
+    role?: string | undefined;
 
     constructor(data?: IProfileVm) {
         if (data) {
@@ -2491,6 +2559,7 @@ export class ProfileVm implements IProfileVm {
             }
             this.faculty = _data["faculty"];
             this.programe = _data["programe"];
+            this.role = _data["role"];
         }
     }
 
@@ -2517,6 +2586,7 @@ export class ProfileVm implements IProfileVm {
         }
         data["faculty"] = this.faculty;
         data["programe"] = this.programe;
+        data["role"] = this.role;
         return data; 
     }
 }
@@ -2528,9 +2598,11 @@ export interface IProfileVm {
     phoneNumbers?: string[] | undefined;
     faculty?: string | undefined;
     programe?: string | undefined;
+    role?: string | undefined;
 }
 
 export class NewsVm implements INewsVm {
+    feedItems?: FeedItem[] | undefined;
 
     constructor(data?: INewsVm) {
         if (data) {
@@ -2542,6 +2614,13 @@ export class NewsVm implements INewsVm {
     }
 
     init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["feedItems"])) {
+                this.feedItems = [] as any;
+                for (let item of _data["feedItems"])
+                    this.feedItems!.push(FeedItem.fromJS(item));
+            }
+        }
     }
 
     static fromJS(data: any): NewsVm {
@@ -2553,11 +2632,65 @@ export class NewsVm implements INewsVm {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.feedItems)) {
+            data["feedItems"] = [];
+            for (let item of this.feedItems)
+                data["feedItems"].push(item.toJSON());
+        }
         return data; 
     }
 }
 
 export interface INewsVm {
+    feedItems?: FeedItem[] | undefined;
+}
+
+export class FeedItem implements IFeedItem {
+    publishDate?: Date;
+    title?: string | undefined;
+    description?: string | undefined;
+    link?: string | undefined;
+
+    constructor(data?: IFeedItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.publishDate = _data["publishDate"] ? new Date(_data["publishDate"].toString()) : <any>undefined;
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.link = _data["link"];
+        }
+    }
+
+    static fromJS(data: any): FeedItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeedItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["publishDate"] = this.publishDate ? this.publishDate.toISOString() : <any>undefined;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["link"] = this.link;
+        return data; 
+    }
+}
+
+export interface IFeedItem {
+    publishDate?: Date;
+    title?: string | undefined;
+    description?: string | undefined;
+    link?: string | undefined;
 }
 
 export class NotifyStudentCommand implements INotifyStudentCommand {
@@ -2992,54 +3125,6 @@ export class AttachmentDto implements IAttachmentDto {
 
 export interface IAttachmentDto {
     id?: number;
-    name?: string | undefined;
-    data?: string | undefined;
-}
-
-export class UploadAttachmentCommand implements IUploadAttachmentCommand {
-    graduationPaperId?: number;
-    stepId?: number;
-    name?: string | undefined;
-    data?: string | undefined;
-
-    constructor(data?: IUploadAttachmentCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.graduationPaperId = _data["graduationPaperId"];
-            this.stepId = _data["stepId"];
-            this.name = _data["name"];
-            this.data = _data["data"];
-        }
-    }
-
-    static fromJS(data: any): UploadAttachmentCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UploadAttachmentCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["graduationPaperId"] = this.graduationPaperId;
-        data["stepId"] = this.stepId;
-        data["name"] = this.name;
-        data["data"] = this.data;
-        return data; 
-    }
-}
-
-export interface IUploadAttachmentCommand {
-    graduationPaperId?: number;
-    stepId?: number;
     name?: string | undefined;
     data?: string | undefined;
 }
@@ -3567,6 +3652,8 @@ export class SupervisorDto implements ISupervisorDto {
     fieldsOfInterest?: FieldOfInterestDto[] | undefined;
     faculty?: string | undefined;
     jobTitle?: string | undefined;
+    studentLimit?: number;
+    degree?: string | undefined;
 
     constructor(data?: ISupervisorDto) {
         if (data) {
@@ -3601,6 +3688,8 @@ export class SupervisorDto implements ISupervisorDto {
             }
             this.faculty = _data["faculty"];
             this.jobTitle = _data["jobTitle"];
+            this.studentLimit = _data["studentLimit"];
+            this.degree = _data["degree"];
         }
     }
 
@@ -3635,6 +3724,8 @@ export class SupervisorDto implements ISupervisorDto {
         }
         data["faculty"] = this.faculty;
         data["jobTitle"] = this.jobTitle;
+        data["studentLimit"] = this.studentLimit;
+        data["degree"] = this.degree;
         return data; 
     }
 }
@@ -3650,6 +3741,8 @@ export interface ISupervisorDto {
     fieldsOfInterest?: FieldOfInterestDto[] | undefined;
     faculty?: string | undefined;
     jobTitle?: string | undefined;
+    studentLimit?: number;
+    degree?: string | undefined;
 }
 
 export class ThesisTopicDto implements IThesisTopicDto {
@@ -4284,6 +4377,46 @@ export interface IGetSupervisorsQuery {
     skip?: number;
 }
 
+export class UpdateStudentLimitCommand implements IUpdateStudentLimitCommand {
+    supervisorId?: number;
+    value?: number;
+
+    constructor(data?: IUpdateStudentLimitCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.supervisorId = _data["supervisorId"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): UpdateStudentLimitCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateStudentLimitCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["supervisorId"] = this.supervisorId;
+        data["value"] = this.value;
+        return data; 
+    }
+}
+
+export interface IUpdateStudentLimitCommand {
+    supervisorId?: number;
+    value?: number;
+}
+
 export class LockUserCommand implements ILockUserCommand {
     id?: number;
 
@@ -4360,6 +4493,7 @@ export class UsersVm implements IUsersVm {
     statuses?: StatusDto[] | undefined;
     roles?: RoleDto[] | undefined;
     users?: UserDto[] | undefined;
+    total?: number;
 
     constructor(data?: IUsersVm) {
         if (data) {
@@ -4387,6 +4521,7 @@ export class UsersVm implements IUsersVm {
                 for (let item of _data["users"])
                     this.users!.push(UserDto.fromJS(item));
             }
+            this.total = _data["total"];
         }
     }
 
@@ -4414,6 +4549,7 @@ export class UsersVm implements IUsersVm {
             for (let item of this.users)
                 data["users"].push(item.toJSON());
         }
+        data["total"] = this.total;
         return data; 
     }
 }
@@ -4422,6 +4558,7 @@ export interface IUsersVm {
     statuses?: StatusDto[] | undefined;
     roles?: RoleDto[] | undefined;
     users?: UserDto[] | undefined;
+    total?: number;
 }
 
 export class StatusDto implements IStatusDto {
@@ -4505,6 +4642,7 @@ export interface IRoleDto {
 }
 
 export class UserDto implements IUserDto {
+    id?: number;
     username?: string | undefined;
     status?: number;
     role?: number;
@@ -4520,6 +4658,7 @@ export class UserDto implements IUserDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.username = _data["username"];
             this.status = _data["status"];
             this.role = _data["role"];
@@ -4535,6 +4674,7 @@ export class UserDto implements IUserDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["username"] = this.username;
         data["status"] = this.status;
         data["role"] = this.role;
@@ -4543,9 +4683,55 @@ export class UserDto implements IUserDto {
 }
 
 export interface IUserDto {
+    id?: number;
     username?: string | undefined;
     status?: number;
     role?: number;
+}
+
+export class GetUsersQuery implements IGetUsersQuery {
+    take?: number;
+    skip?: number;
+
+    constructor(data?: IGetUsersQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.take = _data["take"];
+            this.skip = _data["skip"];
+        }
+    }
+
+    static fromJS(data: any): GetUsersQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetUsersQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["take"] = this.take;
+        data["skip"] = this.skip;
+        return data; 
+    }
+}
+
+export interface IGetUsersQuery {
+    take?: number;
+    skip?: number;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export interface FileResponse {

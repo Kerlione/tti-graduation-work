@@ -8,8 +8,8 @@ export class NotificationService {
 
   constructor(private snackBar: MatSnackBar) { }
 
-  public error(message: string) {
-    this.snackBar.open(message, `Close`, {
+  public error(message: any) {
+    this.snackBar.open(JSON.parse(message.response).detail, `Close`, {
       duration: 5000,
       panelClass: 'snackbar-error',
       verticalPosition: 'top',

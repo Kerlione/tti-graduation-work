@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using tti_graduation_work.Application.Steps.Commands;
@@ -46,30 +48,35 @@ namespace tti_graduation_work.WebUI.Controllers
 
         [HttpGet("{id}/Steps")]
         public async Task<ActionResult<StepsVm>> GetSteps(int id)
-        { 
+        {
             return await Mediator.Send(new GetStepsQuery { GraduationPaperId = id });
         }
 
         [HttpPost("{id}/Step/{stepId}")]
         public async Task<ActionResult<SingleStep>> GetStep(int id, int stepId)
-        {            
-            return await Mediator.Send(new GetStepQuery{ GraduationPaperId = id, StepId = stepId });
+        {
+            return await Mediator.Send(new GetStepQuery { GraduationPaperId = id, StepId = stepId });
         }
 
-        [HttpPut("{id}/Step/{stepId}/Attachment")]
-        public async Task<ActionResult<int>> UploadAttachment(int id, int stepId, UploadAttachmentCommand request)
+        [HttpPost("{id}/Step/{stepId}/Attachment")]
+        public async Task<ActionResult<int>> UploadAttachment(int id, int stepId, IFormFile file)
         {
-            if (id != request.GraduationPaperId)
+            if (file.Length > 0)
             {
-                return BadRequest();
+                using (var ms = new MemoryStream())
+                {
+                    file.CopyTo(ms);
+                    var fileBytes = ms.ToArray();
+                    await Mediator.Send(new UploadAttachmentCommand
+                    {
+                        GraduationPaperId = id,
+                        StepId = stepId,
+                        Name = file.FileName,
+                        Data = fileBytes
+                    });
+                }
             }
-
-            if (stepId != request.StepId)
-            {
-                return BadRequest();
-            }
-
-            return await Mediator.Send(request);
+            return Ok();
         }
 
         [HttpPut("Step/{stepId}/Update")]
@@ -148,11 +155,11 @@ namespace tti_graduation_work.WebUI.Controllers
         [HttpPost("{id}/Step/{stepId}/ToReview")]
         public async Task<ActionResult> SendToReview(int id, int stepId, SendStepToReviewCommand request)
         {
-            if(request.GraduationPaperId != id)
+            if (request.GraduationPaperId != id)
             {
                 return BadRequest();
             }
-            if(request.StepId != stepId)
+            if (request.StepId != stepId)
             {
                 return BadRequest();
             }

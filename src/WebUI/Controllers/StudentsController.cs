@@ -13,7 +13,7 @@ using tti_graduation_work.WebUI.Enums;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class StudentsController: ApiController
     {
         [HttpPost]
@@ -23,7 +23,7 @@ namespace tti_graduation_work.WebUI.Controllers
             var user = await Mediator.Send(new GetUserQuery { Username = username });
             if(user == null)
             {
-                command.UserId = await Mediator.Send(new CreateUserCommand { Role = (int)UserRole.Student, Username = username });
+                command.UserId = await Mediator.Send(new CreateUserCommand { Role = (int)UserRole.Student, Username = username, Password = "P@ssw0rd" });
             }
             else
             {

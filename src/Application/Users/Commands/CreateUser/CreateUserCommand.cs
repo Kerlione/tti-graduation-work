@@ -16,14 +16,17 @@ namespace tti_graduation_work.Application.Users.Commands.CreateUser
 	{
 		public int Role { get; set; }
 		public string Username { get; set; }
+		public string Password { get; set; }
 	}
 
 	public class CommandHandler : IRequestHandler<CreateUserCommand, int>
 	{
 		private IApplicationDbContext _context;
-		public CommandHandler(IApplicationDbContext context)
+		private IPasswordHasher _passwordHasher;
+		public CommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher)
 		{
 			_context = context;
+			_passwordHasher = passwordHasher;
 		}
 		public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
 		{
@@ -31,7 +34,8 @@ namespace tti_graduation_work.Application.Users.Commands.CreateUser
 			{
 				Role = (Role)request.Role,
 				Status = UserStatus.Active,
-				Username = request.Username
+				Username = request.Username,
+				Password = _passwordHasher.Hash(request.Password)
 			};
 
 			_context.Users.Add(entity);

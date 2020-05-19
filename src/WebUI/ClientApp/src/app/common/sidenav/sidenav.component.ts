@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
+import { Router } from '@angular/router';
 
 export interface Section {
   name: string;
@@ -32,12 +35,29 @@ export class SidenavComponent implements OnInit {
     {
       name: 'Supervisors',
       path: '/view/supervisors'
+    },
+    {
+      name: 'Users',
+      path: '/view/users'
     }
-  ]
+  ];
 
-  constructor() { }
+  constructor(public authService: AuthService,
+    public userService: UserService,
+    public router: Router) { }
 
   ngOnInit(): void {
   }
 
+  public logout() {
+    console.log(this.userService);
+    if (this.authService.checkAuthenticated()) {
+      this.userService.clearData();
+    }
+    this.router.navigateByUrl('/login');
+  }
+
+  public getName(): string {
+    return this.userService.getGivenName();
+  }
 }

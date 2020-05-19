@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserRole } from '../models/user-role';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +24,7 @@ token:string   */
    * getToken
    */
   public getTokenData(): any {
-    return JSON.parse(localStorage.getItem('currentUser'));
+    return JSON.parse(localStorage.getItem('currentUser')).token;
   }
 
   /**
@@ -37,5 +36,15 @@ token:string   */
 
   public userRole(): UserRole {
     return this.getTokenData().role;
+  }
+
+  public clearData(): boolean {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('pureToken');
+    return true;
+  }
+
+  public getGivenName(): string {
+    return this.getTokenData().given_name;
   }
 }

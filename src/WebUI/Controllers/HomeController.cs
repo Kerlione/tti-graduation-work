@@ -15,13 +15,13 @@ namespace tti_graduation_work.WebUI.Controllers
         [HttpPost]
         public async Task<ActionResult<ProfileVm>> GetProfile()
         {
-            return await Mediator.Send(new GetProfileQuery() {Username = "St59206" });
+            return await Mediator.Send(new GetProfileQuery() { Username = GetUsername() });
         }
 
         [HttpGet]
         public async Task<ActionResult<NewsVm>> GetNews()
         {
-            return NoContent();
+            return await Mediator.Send(new GetNewsQuery());
         }
     }
 }

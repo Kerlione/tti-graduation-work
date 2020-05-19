@@ -26,12 +26,11 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(request);
         }
 
-        [RoleRequirementAttribute(UserRole.Student)]
+        //[RoleRequirementAttribute(UserRole.Student)]
         [HttpGet]
         public async Task<ActionResult<Application.GraduationPapers.Queries.GetPaper.GraduationPaperDto>> GetPaper()
         {
-            var userId = GetUserId();
-            var studentId = await Mediator.Send(new GetEntityIdQuery { UserId = userId });
+            var studentId = GetEntityId();
             var paperExists = await Mediator.Send(new PaperExistsQuery { StudentId = studentId });
             if (!paperExists)
             {

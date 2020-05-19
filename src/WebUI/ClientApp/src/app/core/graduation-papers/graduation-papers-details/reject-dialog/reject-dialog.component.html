@@ -1,11 +1,13 @@
 <h1 mat-dialog-title>Reject reason</h1>
-<div mat-dialog-content>
-    <mat-form-field>
-        <mat-label>Reason</mat-label>
-        <textarea matInput [(ngModel)]="data.comment"></textarea>
-    </mat-form-field>
-</div>
-<div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">Cancel</button>
-    <button mat-button [mat-dialog-close]="data.comment" cdkFocusInitial>Ok</button>
-</div>
+<form #formControl="ngForm">
+    <div class="form">
+        <mat-form-field color="accent">
+            <textarea matInput #input placeholder="Reason" [(ngModel)]="data.comment" required name="comment" required maxlength="2048" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"></textarea>
+            <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button [disabled]="!formControl.valid" [mat-dialog-close]="data.comment" (click)="submit()" [mat-dialog-close]="1">Confirm</button>
+        <button mat-button color="accent" (click)="onNoClick()">Cancel</button>
+    </div>
+</form>

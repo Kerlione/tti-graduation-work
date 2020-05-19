@@ -326,7 +326,7 @@
       }
     },
     "/api/Steps/{id}/Step/{stepId}/Attachment": {
-      "put": {
+      "post": {
         "tags": [
           "Steps"
         ],
@@ -351,20 +351,19 @@
               "format": "int32"
             },
             "x-position": 2
+          },
+          {
+            "type": "file",
+            "name": "file",
+            "in": "formData",
+            "schema": {
+              "type": "string",
+              "format": "binary",
+              "nullable": true
+            },
+            "nullable": true
           }
         ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadAttachmentCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 3
-        },
         "responses": {
           "200": {
             "description": "",
@@ -695,12 +694,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "get": {
         "tags": [
@@ -718,12 +712,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Supervisors/{id}/Profile": {
@@ -1145,7 +1134,52 @@
         }
       }
     },
-    "/api/Users/lock/{id}": {
+    "/api/Supervisors/{id}/UpdateLimit": {
+      "post": {
+        "tags": [
+          "Supervisors"
+        ],
+        "operationId": "Supervisors_UpdateStudentLimit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudentLimitCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{id}/Lock": {
       "put": {
         "tags": [
           "Users"
@@ -1190,7 +1224,7 @@
         }
       }
     },
-    "/api/Users/unlock/{id}": {
+    "/api/Users/{id}/Unlock": {
       "put": {
         "tags": [
           "Users"
@@ -1256,7 +1290,7 @@
         }
       }
     },
-    "/api/Users": {
+    "/api/Users/Create": {
       "post": {
         "tags": [
           "Users"
@@ -1275,12 +1309,26 @@
             }
           }
         }
-      },
-      "get": {
+      }
+    },
+    "/api/Users": {
+      "post": {
         "tags": [
           "Users"
         ],
-        "operationId": "Users_Get",
+        "operationId": "Users_GetUsers",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetUsersQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "",
@@ -1488,6 +1536,14 @@
           "paperType": {
             "type": "integer",
             "format": "int32"
+          },
+          "finishedStepCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalStepCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1564,12 +1620,47 @@
           "programe": {
             "type": "string",
             "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
       "NewsVm": {
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "properties": {
+          "feedItems": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/FeedItem"
+            }
+          }
+        }
+      },
+      "FeedItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "publishDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "link": {
+            "type": "string",
+            "nullable": true
+          }
+        }
       },
       "NotifyStudentCommand": {
         "type": "object",
@@ -1744,28 +1835,6 @@
         "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "data": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UploadAttachmentCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "graduationPaperId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "stepId": {
             "type": "integer",
             "format": "int32"
           },
@@ -2062,6 +2131,14 @@
           "jobTitle": {
             "type": "string",
             "nullable": true
+          },
+          "studentLimit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "degree": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -2350,6 +2427,20 @@
           }
         }
       },
+      "UpdateStudentLimitCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "supervisorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "LockUserCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -2394,6 +2485,10 @@
             "items": {
               "$ref": "#/components/schemas/UserDto"
             }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2429,6 +2524,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
           "username": {
             "type": "string",
             "nullable": true
@@ -2438,6 +2537,20 @@
             "format": "int32"
           },
           "role": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "GetUsersQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "take": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skip": {
             "type": "integer",
             "format": "int32"
           }

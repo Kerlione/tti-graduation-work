@@ -1,1 +1,23 @@
-<p>home works!</p>
+<div class="row">
+    <div class="col-sm-12">
+        <div *ngIf="isDataLoading" class="loader-wrapper">
+            <mat-spinner mode="indeterminate" class="loader">Loading</mat-spinner>
+        </div>
+        <div class="container">
+            <div *ngFor="let feed of feeds">
+                <mat-card class="singleNews">
+                    <div class="cardbody">
+                        <mat-card-title>{{feed.title}}</mat-card-title>
+                        <mat-card-content>
+                            <div [innerHTML]="feed.description"></div>
+                        </mat-card-content>
+                    </div>
+
+                    <mat-card-actions align="end">
+                        <a href="{{feed.link}}" target="_blank" mat-raised-button color="accent">Read More</a>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+</div>

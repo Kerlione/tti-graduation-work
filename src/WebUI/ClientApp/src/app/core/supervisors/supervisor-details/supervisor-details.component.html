@@ -1,31 +1,48 @@
 <div class="mat-elevation-z8">
     <h2 class="title">Supervisor profile</h2>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <mat-card class="card-view" *ngIf="supervisor">
                 <mat-card-header>
                     <mat-card-title>{{supervisor.firstName}} {{supervisor.lastName}}</mat-card-title>
                     <mat-card-subtitle>{{supervisor.jobTitle}}</mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
-                    <div class="row">text</div>
-                    <div class="row">text</div>
-                    <div class="row">text</div>
-                    <div class="row">text</div>
-                    <div class="row">text</div>
-                    <div class="row">text</div>
-                    <div class="row">text</div>
+                    <p class="details-row">Faculty: {{supervisor.faculty}}</p>
+                    <mat-divider></mat-divider>
+                    <p class="details-row">Degree: {{supervisor.degree}}</p>
+                    <mat-divider></mat-divider>
+                    <p class="details-row">Speaking languages</p>
+                    <ul>
+                        <li *ngFor="let language of supervisor.languages">
+                            {{ language }}
+                        </li>
+                    </ul>
+                    <mat-divider></mat-divider>
+                    <p class="details-row">Phone: <a href="tel:{{supervisor.phone}}">{{supervisor.phone}}</a></p>
+                    <mat-divider></mat-divider>
+                    <p class="details-row">Email: <a href="mailto:{{supervisor.email}}">{{supervisor.email}}</a></p>
+                    <mat-divider></mat-divider>
+                    <p class="details-row">Student Limit: {{supervisor.studentLimit}}</p>
                 </mat-card-content>
+                <mat-card-actions>
+                    <button mat-stroked-button (click)="updateStudentLimit()">Update student limit</button>
+                </mat-card-actions>
             </mat-card>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-8">
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-10">
                     <h2 class="subtitle">Fields of Interest</h2>
+                </div>
+                <div class="col-sm-2">
+                    <button mat-icon-button color="primary" aria-label="Add new field" (click)="addField()">
+                        <mat-icon>add</mat-icon>
+                      </button>
                 </div>
             </div>
             <div class="col-sm-12">
-                <table mat-table class="half-width-table" matSort aria-label="Elements" [dataSource]="interestsDs" *ngIf="interests?.length > 0">
+                <table mat-table class="full-width-table" matSort aria-label="Fields of Interest" [dataSource]="interestsDs" *ngIf="interests?.length > 0">
                     <!-- Id Column -->
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
@@ -33,22 +50,22 @@
                     </ng-container>
 
                     <ng-container matColumnDef="titleEn">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Title EN</th>
-                        <td mat-cell *matCellDef="let row">{{row.titleEn}}</td>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>English</th>
+                        <td mat-cell *matCellDef="let row" class="mat-cell">{{row.title_EN}}</td>
                     </ng-container>
                     <ng-container matColumnDef="titleLv">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Title LV</th>
-                        <td mat-cell *matCellDef="let row">{{row.titleLv}}</td>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Latvian</th>
+                        <td mat-cell *matCellDef="let row" class="mat-cell">{{row.title_LV}}</td>
                     </ng-container>
                     <ng-container matColumnDef="titleRu">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Title RU</th>
-                        <td mat-cell *matCellDef="let row">{{row.titleRu}}</td>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Russian</th>
+                        <td mat-cell *matCellDef="let row" class="mat-cell">{{row.title_RU}}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
                         <td mat-cell *matCellDef="let row">
-                            <button mat-button color="primary" (click)="editField(row.id)">Edit</button>
+                            <button mat-button color="primary" (click)="editField(row)">Edit</button>
                             <button mat-button color="primary" (click)="deleteField(row.id)">Delete</button>
                         </td>
                     </ng-container>
@@ -58,54 +75,57 @@
                 </table>
 
 
-                <mat-paginator #paginator [length]="interestsDs?.data.length" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]">
+                <mat-paginator #interestsPaginator [length]="interestsDs?.data.length" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 15, 20]">
                 </mat-paginator>
             </div>
-            <mat-divider></mat-divider>
+            <mat-divider class="between-tables"></mat-divider>
             <div class="row">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <h2 class="subtitle">Topics</h2>
-                    </div>
+                <div class="col-sm-10">
+                    <h2 class="subtitle">Topics</h2>
                 </div>
-                <div class="col-sm-12">
-                    <table mat-table class="half-width-table" matSort aria-label="Topics" [dataSource]="topicsDs" *ngIf="topics?.length > 0">
-                        <!-- Id Column -->
-                        <ng-container matColumnDef="id">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
-                            <td mat-cell *matCellDef="let row">{{row.id}}</td>
-                        </ng-container>
-
-                        <ng-container matColumnDef="titleEn">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Title EN</th>
-                            <td mat-cell *matCellDef="let row">{{row.titleEn}}</td>
-                        </ng-container>
-                        <ng-container matColumnDef="titleLv">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Title LV</th>
-                            <td mat-cell *matCellDef="let row">{{row.titleLv}}</td>
-                        </ng-container>
-                        <ng-container matColumnDef="titleRu">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Title RU</th>
-                            <td mat-cell *matCellDef="let row">{{row.titleRu}}</td>
-                        </ng-container>
-
-
-                        <ng-container matColumnDef="actions">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
-                            <td mat-cell *matCellDef="let row">
-                                <button mat-button color="primary" (click)="editTopic(row.id)">Edit</button>
-                                <button mat-button color="primary" (click)="deleteTopic(row.id)">Delete</button>
-                            </td>
-                        </ng-container>
-
-                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                    </table>
-
-
-                    <mat-paginator #paginator [length]="topicsDs?.data.length" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]">
-                    </mat-paginator>
+                <div class="col-sm-2">
+                    <button mat-icon-button color="primary" aria-label="Add new topic" (click)="addTopic()">
+                        <mat-icon>add</mat-icon>
+                      </button>
                 </div>
+            </div>
+            <div class="col-sm-12">
+                <table mat-table class="full-width-table" matSort aria-label="Topics" [dataSource]="topicsDs" *ngIf="topics?.length > 0">
+                    <!-- Id Column -->
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+                        <td mat-cell *matCellDef="let row">{{row.id}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="titleEn">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>English</th>
+                        <td mat-cell *matCellDef="let row" class="mat-cell">{{row.title_EN}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="titleLv">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Latvian</th>
+                        <td mat-cell *matCellDef="let row" class="mat-cell">{{row.title_LV}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="titleRu">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Russian</th>
+                        <td mat-cell *matCellDef="let row" class="mat-cell">{{row.title_RU}}</td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+                        <td mat-cell *matCellDef="let row">
+                            <button mat-button color="primary" (click)="editTopic(row)">Edit</button>
+                            <button mat-button color="primary" (click)="deleteTopic(row.id)">Delete</button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+
+
+                <mat-paginator #topicsPaginator [length]="topicsDs?.data.length" [pageIndex]="0" [pageSize]="5" [pageSizeOptions]="[5, 10, 15, 20]">
+                </mat-paginator>
             </div>
         </div>
     </div>

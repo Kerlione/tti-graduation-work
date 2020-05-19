@@ -1,1 +1,29 @@
-<p>edit-dialog works!</p>
+<h3 mat-dialog-title>Edit {{data.type}}</h3>
+
+<form (ngSubmit)="submit" #formControl="ngForm">
+    <div class="form">
+        <mat-form-field color="accent">
+            <textarea matInput #input placeholder="Title EN" [(ngModel)]="data.fields.title_EN" name="en_title" required maxlength="1024"></textarea>
+            <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+        </mat-form-field>
+    </div>
+
+    <div class="form">
+        <mat-form-field color="accent">
+            <textarea matInput #input placeholder="Title LV" [(ngModel)]="data.fields.title_LV" name="lv_title" required maxlength="1024"></textarea>
+            <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+        </mat-form-field>
+    </div>
+
+    <div class="form">
+        <mat-form-field color="accent">
+            <textarea matInput #input placeholder="Title RU" [(ngModel)]="data.fields.title_RU" name="ru_title" required maxlength="1024"></textarea>
+            <mat-error *ngIf="formControl.invalid">{{getErrorMessage()}}</mat-error>
+        </mat-form-field>
+    </div>
+
+    <div mat-dialog-actions>
+        <button mat-button [type]="submit" [disabled]="!formControl.valid" [mat-dialog-close]="1" (click)="confirmUpdate()">Save</button>
+        <button mat-button color="accent" (click)="onNoClick()" tabindex="-1">Cancel</button>
+    </div>
+</form>

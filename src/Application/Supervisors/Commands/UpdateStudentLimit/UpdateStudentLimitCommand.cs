@@ -33,8 +33,10 @@ namespace tti_graduation_work.Application.Supervisors.Commands.UpdateStudentCoun
 			{
 				throw new NotFoundException($"Supervisor not found");
 			}
+			
+			supervisor.StudentLimit = request.Value;
 
-			//supervisor.
+			await _context.SaveChangesAsync(cancellationToken);
 
 			return Unit.Value;
 		}

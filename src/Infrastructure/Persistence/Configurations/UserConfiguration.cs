@@ -13,7 +13,14 @@ namespace tti_graduation_work.Infrastructure.Persistence.Configurations
         {
             builder
                 .Property(u => u.Username)
-                .HasMaxLength(100);
+                .HasMaxLength(100)
+                .IsRequired();
+
+
+            builder
+                .Property(u => u.Password)
+                .HasMaxLength(1024)
+                .IsRequired();
 
             builder
                 .HasAlternateKey(u => u.Username);

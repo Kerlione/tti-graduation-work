@@ -19,13 +19,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AppComponent } from './app.component';
 import { SidenavComponent } from '../app/common/sidenav/sidenav.component';
 import { HomeComponent } from './core/home/home.component';
 import { StudentsTableComponent } from './core/students/students-table/students-table.component';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule, BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GraduationPapersTableComponent } from './core/graduation-papers/graduation-papers-table/graduation-papers-table.component';
 import { MatButtonModule } from '@angular/material/button';
 import { GraduationPapersDetailsComponent } from './core/graduation-papers/graduation-papers-details/graduation-papers-details.component';
@@ -38,6 +40,10 @@ import { SupervisorDetailsComponent } from './core/supervisors/supervisor-detail
 import { AddDialogComponent } from './core/supervisors/supervisor-details/dialogs/add-dialog/add-dialog.component';
 import { EditDialogComponent } from './core/supervisors/supervisor-details/dialogs/edit-dialog/edit-dialog.component';
 import { DeleteDialogComponent } from './core/supervisors/supervisor-details/dialogs/delete-dialog/delete-dialog.component';
+import { UpdateStudentLimitComponent } from './core/supervisors/supervisor-details/dialogs/update-student-limit/update-student-limit.component';
+import { AuthorizeInterceptor } from './services/authorize.interceptor';
+import { UsersTableComponent } from './core/users/users-table/users-table.component';
+import { ProfileComponent } from './core/profile/profile.component';
 
 
 const appRoutes: Routes = [
@@ -50,7 +56,9 @@ const appRoutes: Routes = [
   { path: 'graduation-paper/start', component: StepFormComponent },
   { path: 'view/students', component: StudentsTableComponent },
   { path: 'view/supervisors', component: SupervisorsTableComponent },
-  { path: 'view/supervisors/:id/details', component: SupervisorDetailsComponent }
+  { path: 'view/supervisors/:id/details', component: SupervisorDetailsComponent },
+  { path: 'view/users', component: UsersTableComponent },
+  { path: 'profile', component: ProfileComponent }
 ]
 
 @NgModule({
@@ -69,7 +77,10 @@ const appRoutes: Routes = [
     SupervisorDetailsComponent,
     AddDialogComponent,
     EditDialogComponent,
-    DeleteDialogComponent
+    DeleteDialogComponent,
+    UpdateStudentLimitComponent,
+    UsersTableComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -77,7 +88,7 @@ const appRoutes: Routes = [
       appRoutes
     ),
     ModalModule.forRoot(),
-    NoopAnimationsModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -97,11 +108,18 @@ const appRoutes: Routes = [
     MatSelectModule,
     MatRadioModule,
     MatDialogModule,
-    MatCardModule
+    MatCardModule,
+    MatIconModule,
+    MatProgressBarModule
   ],
   bootstrap: [AppComponent],
   providers: [
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } }
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthorizeInterceptor,
+      multi: true
+    }
   ]
 })
 export class AppModule { }

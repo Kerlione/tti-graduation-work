@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="mat-elevation-z8">
+            <h2 class="title">Users</h2>
+            <div class="row">
+                <div class="col-sm-4">
+                    <button mat-raised-button color="primary" (click)="synchronize()" class="top-button">Synchronize</button>
+                </div>
+            </div>
+            <table mat-table class="full-width-table" matSort aria-label="Supervisors" [dataSource]="tableDs">
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+                    <td mat-cell *matCellDef="let row">{{row.id}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="username">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
+                    <td mat-cell *matCellDef="let row">{{row.username}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                    <td mat-cell *matCellDef="let row">{{findStatus(row.status)}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="role">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Role</th>
+                    <td mat-cell *matCellDef="let row">{{findRole(row.role)}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+                    <td mat-cell *matCellDef="let row">
+                        <button mat-button color="accent" *ngIf="row.status === 1" (click)="lock(row.id)">Lock</button>
+                        <button mat-button color="accent" *ngIf="row.status === 0" (click)="unlock(row.id)">Unlock</button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            <mat-paginator #paginator [length]="totalCount" [pageIndex]="0" [pageSize]="defaultPageSize" [pageSizeOptions]="[10, 15, 50, 100]" (page)="pageEvent = getPagedData($event)">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

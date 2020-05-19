@@ -23,12 +23,22 @@
 
         <ng-container matColumnDef="paperStatus">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Paper Status</th>
-            <td mat-cell *matCellDef="let row">{{paperStatuses[row.paperStatus].name}}</td>
+            <td mat-cell *matCellDef="let row">{{splitText(paperStatuses[row.paperStatus].name)}}</td>
         </ng-container>
 
         <ng-container matColumnDef="paperType">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Paper Type</th>
-            <td mat-cell *matCellDef="let row">{{paperTypes[row.paperType].name}}</td>
+            <td mat-cell *matCellDef="let row">{{splitText(paperTypes[row.paperType].name)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="finishedSteps">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Finished Steps</th>
+            <td mat-cell *matCellDef="let row">{{row.finishedStepCount}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalSteps">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Steps</th>
+            <td mat-cell *matCellDef="let row">{{row.totalStepCount}}</td>
         </ng-container>
 
         <ng-container matColumnDef="actions">

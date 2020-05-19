@@ -13,12 +13,13 @@ import { UserRole } from 'src/app/models/user-role';
 import { NotificationService } from 'src/app/services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RejectDialogComponent } from './reject-dialog/reject-dialog.component';
+import { StringSplitService } from 'src/app/services/string-split.service';
 
 @Component({
   selector: 'app-graduation-papers-details',
   templateUrl: './graduation-papers-details.component.html',
   styleUrls: ['./graduation-papers-details.component.css'],
-  providers: [UserService, NotificationService]
+  providers: [UserService, NotificationService, StringSplitService]
 })
 export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
   @ViewChild(MatSort) sort: MatSort;
@@ -33,11 +34,16 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
 
   displayedColumns = ['stepType', 'stepStatus', 'actions'];
 
+  colors: string[] = [
+    'gray', 'blue', 'orange', 'purple', 'red', 'green'
+  ];
+
   constructor(private stepsClient: StepsClient,
     private route: ActivatedRoute,
     private userService: UserService,
     private notificationService: NotificationService,
-    private dialog: MatDialog) {
+    private dialog: MatDialog,
+    private stringSplitService: StringSplitService) {
 
   }
 
@@ -62,7 +68,6 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
           this.tableDs.sort = this.sort;
           this.tableDs.dataSource = this.dataSource;
           this.graduationPaper = result.graduationPaper;
-          console.log(this.graduationPaper);
         }
       },
       error => {
@@ -126,7 +131,7 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
-      if (result !== -1) {
+      if (result === 1) {
         this.stepsClient.rejectStep(this.paperId, stepId,
           RejectStepCommand.fromJS({ stepId: stepId, graduationPaperId: this.paperId, reason: result }))
           .subscribe(res => {
@@ -141,11 +146,11 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
   }
 
   public getTypeByValue(value: number): string {
-    return this.stepTypes.find(x => x.value === value).name;
+    return this.stringSplitService.split(this.stepTypes.find(x => x.value === value).name);
   }
 
   public getStatusByValue(value: number): string {
-    return this.stepStatuses.find(x => x.value === value).name;
+    return this.stringSplitService.split(this.stepStatuses.find(x => x.value === value).name);
   }
 
   public allowEdit(id: number) {
@@ -166,4 +171,10 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
       }
     }
   }
+
+  public stepProgress(): number {
+    const percentage = 100 / this.dataSource.length * this.dataSource.filter(x => x.stepStatus === 5).length;
+    return percentage;
+  }
+  
 }

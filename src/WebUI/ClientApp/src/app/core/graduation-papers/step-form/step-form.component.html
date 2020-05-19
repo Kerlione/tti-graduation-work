@@ -1,4 +1,4 @@
-<div class="col-sm-12" *ngIf="stepData">
+<div class="col-sm-12" *ngIf="stepDataModel">
     <form (ngSubmit)="onSubmit()" [formGroup]="form" [style.fontSize.px]="15" *ngIf="stepDataModel.isForm">
 
         <div *ngFor="let question of stepDataModel.formData" class="form-row">
@@ -7,8 +7,8 @@
 
         <div class="form-row">
             <button mat-stroked-button type="submit" [disabled]="!form.valid">Save</button>
-            <button mat-stroked-button color="primary" [disabled]="!form.valid && stepData.stepStatus !== 3" (click)="finishStep()">Finish</button>
-            <button mat-stroked-button color="accent" [disabled]="!form.valid && stepData.stepStatus !== 1" (click)="sendToReview()">Send to Review</button>
+            <button mat-stroked-button color="primary" [disabled]="stepData.stepStatus !== 3" (click)="finishStep()">Finish</button>
+            <button mat-stroked-button color="accent" [disabled]="stepData.stepStatus !== 1" (click)="sendToReview()">Send to Review</button>
             <button mat-stroked-button color="warn" [routerLink]="['../..', 'details' ]">Cancel</button>
         </div>
     </form>
@@ -22,11 +22,29 @@
                 <p [innerHTML]="stepDataModel.cardData.content"></p>
             </mat-card-content>
             <mat-card-actions>
-                <button mat-stroked-button [disabled]="stepData.stepStatus === 5 || stepData.stepStatus === 2" (click)="save()">Mark as Read</button>
-                <button mat-stroked-button color="primary" [disabled]="stepData.stepStatus !== 3" (click)="finishStep()">Finish</button>
-                <button mat-stroked-button color="accent" [disabled]="stepData.stepStatus !== 1" (click)="sendToReview()">Send to Review</button>
-                <button mat-stroked-button color="warn" [routerLink]="['../..', 'details' ]">Cancel</button>
+                <div *ngIf="!noPaper">
+                    <button mat-stroked-button [disabled]="stepData.stepStatus === 5 || stepData.stepStatus === 2" (click)="save()">Mark as Read</button>
+                    <button mat-stroked-button color="primary" [disabled]="stepData.stepStatus !== 3" (click)="finishStep()">Finish</button>
+                    <button mat-stroked-button color="accent" [disabled]="stepData.stepStatus !== 1" (click)="sendToReview()">Send to Review</button>
+                    <button mat-stroked-button color="warn" [routerLink]="['../..', 'details' ]">Cancel</button>
+                </div>
+                <div *ngIf="noPaper">
+                    <button mat-stroked-button (click)="createPaper()">Continue</button>
+                </div>
             </mat-card-actions>
         </mat-card>
+    </div>
+    <div class="row" *ngIf="!noPaper">
+        <div class="col-sm-6">
+
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="file">Choose File</label>
+                <input type="file" id="file" (change)="handleFileInput($event.target.files)">
+            </div>
+            <!-- <input #csvInput hidden="true" type="file" onclick="this.value=null" (change)="fileInputChange($event)" />
+            <button mat-flat-button color="primary" (click)="csvInput.click()">Choose attachment</button> -->
+        </div>
     </div>
 </div>

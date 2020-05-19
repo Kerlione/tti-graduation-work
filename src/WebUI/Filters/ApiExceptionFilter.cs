@@ -19,6 +19,8 @@ namespace tti_graduation_work.WebUI.Filters
             {
                 { typeof(ValidationException), HandleValidationException },
                 { typeof(NotFoundException), HandleNotFoundException },
+                { typeof(UserLockedException), HandleUserLockedException },
+                { typeof(NotAccessibleEntityException), HandlEntityNotAccessibleException }
             };
         }
 
@@ -84,6 +86,34 @@ namespace tti_graduation_work.WebUI.Filters
             };
 
             context.Result = new NotFoundObjectResult(details);
+
+            context.ExceptionHandled = true;
+        }
+
+        private void HandleUserLockedException(ExceptionContext context)
+        {
+            var exception = context.Exception as UserLockedException;
+
+            var details = new ProblemDetails()
+            {
+                Detail = exception.Message
+            };
+
+            context.Result = new BadRequestObjectResult(details);
+
+            context.ExceptionHandled = true;
+        }
+
+        private void HandlEntityNotAccessibleException(ExceptionContext context)
+        {
+            var exception = context.Exception as NotAccessibleEntityException;
+
+            var details = new ProblemDetails()
+            {
+                Detail = exception.Message
+            };
+
+            context.Result = new BadRequestObjectResult(details);
 
             context.ExceptionHandled = true;
         }

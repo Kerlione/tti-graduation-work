@@ -15,6 +15,10 @@ namespace tti_graduation_work.Infrastructure.Persistence.Configurations
                 .HasMaxLength(256)
                 .IsRequired();
 
+
+            builder.Property(a => a.Content)
+                .HasMaxLength(65536);
+
             builder
                 .HasOne<Step>(a => a.Step)
                 .WithMany(s => s.Attachments);

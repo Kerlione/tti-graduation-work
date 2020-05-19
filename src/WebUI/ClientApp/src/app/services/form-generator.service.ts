@@ -4,6 +4,7 @@ import { TextboxField } from '../field-elements/field-textbox';
 import { DropdownField } from '../field-elements/field-dropdown';
 import { StepData } from '../models/step-data';
 import { StepCardData } from '../models/step-card-data';
+import { RadioField } from '../field-elements/field-radio';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,27 @@ export class FormGeneratorService {
     let data = new StepData();
     let form: QuestionBase<any>[] = [];
     switch (stepType) {
+      case 0: {
+        data.isForm = false;
+        data.cardData = new StepCardData();
+        data.cardData.title = 'Welcome to Graduation Paper process';
+        data.cardData.content = `<p><b>This is the welcome screen of the step-based graduation paper preparation.</b></p>
+        <p>This step provides basic information about the procedure of step following.</p>
+        <p>This guide will help you to successfully finish the graduation, 
+        if you follow the steps and the supervisor helps you and validates your work.</p>
+        <p>Example steps are:</p>
+        <ul>
+          <li>Topic selection for graduation paper</li>
+          <li>Thesis topic defence</li>
+          <li>Thesis development</li>
+          <li>Thesis pre-defence</li>
+          <li>Thesis upload</li>
+          <li>Plagiarism check</li>
+          <li>Thesis delivery</li>
+          <li>Thesis defence</li>
+        </ul>`;
+        break;
+      }
       // Topic Approval
       case 1: {
         form.push(
@@ -49,6 +71,17 @@ export class FormGeneratorService {
             options: selectData,
             required: true,
             order: 4,
+            readonly: readonly
+          }),
+          new RadioField({
+            key: 'paperType',
+            label: 'Paper type',
+            options: [
+              { key: 0, value: 'Bachelor' },
+              { key: 1, value: 'Master' }
+            ],
+            required: true,
+            order: 5,
             readonly: readonly
           })
         );

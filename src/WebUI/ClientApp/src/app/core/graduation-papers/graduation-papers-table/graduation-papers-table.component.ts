@@ -13,12 +13,13 @@ import {
 } from 'src/app/tti_graduation_work-api';
 import { MatButton } from '@angular/material/button';
 import { NotificationService } from 'src/app/services/notification.service';
+import { StringSplitService } from 'src/app/services/string-split.service';
 
 @Component({
   selector: 'app-graduation-papers-table',
   templateUrl: './graduation-papers-table.component.html',
   styleUrls: ['./graduation-papers-table.component.css'],
-  providers: [NotificationService]
+  providers: [NotificationService, StringSplitService]
 })
 export class GraduationPapersTableComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -35,9 +36,10 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
   paperStatuses: PaperStatusDto[];
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['title', 'supervisor', 'student', 'paperStatus', 'paperType', 'actions'];
+  displayedColumns = ['title', 'supervisor', 'student', 'paperStatus', 'paperType', 'finishedSteps', 'totalSteps', 'actions'];
   constructor(private graduationPapersClient: GraduationPaperClient,
-    private notificationService: NotificationService) {
+    private notificationService: NotificationService,
+    private stringSplitService: StringSplitService) {
     this.graduationPapersClient = graduationPapersClient;
   }
   query: GetGraduationPapersQuery;
@@ -48,7 +50,7 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
 
   private getData(query: GetGraduationPapersQuery) {
     this.isDataLoading = true;
-    this.graduationPapersClient.get(this.query).subscribe(
+    this.graduationPapersClient.get(query).subscribe(
       result => {
         if (result.graduationPapers.length) {
           this.dataSource = result.graduationPapers;
@@ -92,10 +94,9 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
         }
       },
       error => {
-        console.error(error);
+        this.notificationService.error(error);
         this.isDataLoading = false;
       });
-    console.log(this.dataSource);
     return event;
   }
 
@@ -106,6 +107,7 @@ export class GraduationPapersTableComponent implements AfterViewInit, OnInit, On
     this.query = null;
   }
 
-  public openDetails(id: number) {
+  public splitText(text: string): string {
+    return this.stringSplitService.split(text);
   }
 }

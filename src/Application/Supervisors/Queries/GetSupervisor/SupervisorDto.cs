@@ -18,6 +18,8 @@ namespace tti_graduation_work.Application.Supervisors.Queries.GetSupervisor
         public IList<FieldOfInterestDto> FieldsOfInterest { get; set; }
         public string Faculty { get; set; }
         public string JobTitle { get; set; }
+        public int StudentLimit { get; set; }
+        public string Degree { get; set; }
 
         public void Mapping(Profile profile)
         {
@@ -30,7 +32,9 @@ namespace tti_graduation_work.Application.Supervisors.Queries.GetSupervisor
                 .ForMember(x => x.Faculty, opt => opt.MapFrom(s => s.Faculty.Title_EN))
                 .ForMember(x => x.JobTitle, opt => opt.MapFrom(s => s.JobPosition.Title_EN))
                 .ForMember(x => x.FieldsOfInterest, opt => opt.MapFrom(s => s.FieldsOfInterest))
-                .ForMember(x => x.Topics, opt => opt.MapFrom(s => s.ThesisTopics));
+                .ForMember(x => x.Topics, opt => opt.MapFrom(s => s.ThesisTopics))
+                .ForMember(x => x.Degree, opt => opt.MapFrom(s => s.Degree))
+                .ForMember(x => x.StudentLimit, opt => opt.MapFrom(s => s.StudentLimit));
         }
     }
 }

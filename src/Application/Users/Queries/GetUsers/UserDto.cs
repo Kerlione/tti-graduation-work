@@ -9,12 +9,14 @@ namespace tti_graduation_work.Application.Users.Queries.GetUsers
 {
     public class UserDto : IMapFrom<User>
     {
+        public int Id { get; set; }
         public string Username { get; set; }
         public int Status { get; set; }
         public int Role { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<User, UserDto>()
+                .ForMember(u => u.Id, opt => opt.MapFrom(s => s.Id))
                 .ForMember(u => u.Status, opt => opt.MapFrom(s => (int)s.Status))
                 .ForMember(u => u.Role, opt => opt.MapFrom(r => (int)r.Role));
         }

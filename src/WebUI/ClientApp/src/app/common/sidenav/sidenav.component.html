@@ -1,3 +1,13 @@
-<mat-nav-list>
+<mat-nav-list *ngIf="authService.checkAuthenticated()">
+    <div mat-list-item class="flex-container">
+        <button mat-icon-button routerLink="/home">
+            <mat-icon aria-label="Home">home</mat-icon>
+        </button>
+        <div>TTI</div>
+        <button mat-icon-button (click)="logout()">
+            <mat-icon aria-label="Home">exit_to_app</mat-icon>
+        </button>
+    </div>
+    <a mat-list-item routerLink="/profile">Welcome, {{getName()}}</a>
     <a mat-list-item [routerLink]="link.path" *ngFor="let link of links"> {{ link.name }} </a>
 </mat-nav-list>

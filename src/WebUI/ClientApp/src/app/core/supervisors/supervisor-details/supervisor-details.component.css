@@ -1,5 +1,6 @@
 .full-width-table {
     width: 100%;
+    padding-bottom: 10px;
 }
 
 .card-view {
@@ -12,5 +13,17 @@
 
 .subtitle {
     margin: 5px;
-    font-size: 12px;
+}
+
+.details-row {
+    padding-top: 5px;
+}
+
+.mat-cell {
+    padding: 5px;
+}
+
+.between-tables {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }

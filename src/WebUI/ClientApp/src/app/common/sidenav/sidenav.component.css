@@ -1,0 +1,13 @@
+.authorized-row {
+    display: table-cell;
+}
+
+.authorizer-row button {
+    display: table-cell;
+    margin-right: 8px;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+}

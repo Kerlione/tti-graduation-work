@@ -7,6 +7,6 @@ namespace tti_graduation_work.Application.Common.Interfaces
 {
     public interface IAuthRepository
     {
-        public string CreateToken(User user);
+        public string CreateToken(IProfileData profile);
     }
 }

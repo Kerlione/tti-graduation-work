@@ -10,3 +10,21 @@
 mat-label {
     font-size: 15pt;
 }
+
+.example-radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.example-radio-button {
+    margin: 5px;
+}
+
+.example-radio-label {
+    color: rgba(0, 0, 0, .54);
+}
+
+.form>* {
+    width: 60%;
+}

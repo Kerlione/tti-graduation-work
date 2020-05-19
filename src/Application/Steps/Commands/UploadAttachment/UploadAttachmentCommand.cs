@@ -17,7 +17,7 @@ namespace tti_graduation_work.Application.Steps.Commands.UploadAttachment
 		public int GraduationPaperId { get; set; }
 		public int StepId { get; set; }
 		public string Name { get; set; }
-		public string Data { get; set; }
+		public byte[] Data { get; set; }
 	}
 
 	public class UploadAttachmentCommandHandler : IRequestHandler<UploadAttachmentCommand, int>
@@ -50,7 +50,7 @@ namespace tti_graduation_work.Application.Steps.Commands.UploadAttachment
 			{
 				StepId = request.StepId,
 				Name = request.Name,
-				Content = Convert.FromBase64String(request.Data)
+				Content = request.Data
 			};
 
 			_context.Attachements.Add(entity);

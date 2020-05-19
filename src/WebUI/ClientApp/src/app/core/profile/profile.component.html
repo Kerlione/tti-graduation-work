@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="col-sm-8">
+        <mat-card class="card-view" *ngIf="profile">
+            <mat-card-header>
+                <mat-card-title>Profile: {{profile.firstName}} {{profile.lastName}}</mat-card-title>
+                <mat-card-subtitle>Role: {{profile.role}}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="profile.faculty">
+                    <p class="details-row">Faculty: {{profile.faculty}}</p>
+                    <mat-divider></mat-divider>
+                </div>
+                <div *ngIf="profile.programe">
+                    <p class="details-row">Programe: {{profile.programe}}</p>
+                    <mat-divider></mat-divider>
+                </div>
+                <div *ngIf="profile.phoneNumbers">
+                    <p class="details-row">Phone numbers</p>
+                    <ul>
+                        <li *ngFor="let phone of profile.phoneNumbers">
+                            <p class="details-row">Phone: <a href="tel:{{phone}}">{{phone}}</a></p>
+                        </li>
+                    </ul>
+                    <mat-divider></mat-divider>
+                </div>
+                <div *ngIf="profile.emails">
+                    <p class="details-row">Emails</p>
+                    <ul>
+                        <li *ngFor="let email of profile.emails">
+                            <p class="details-row">Email: <a href="mailto:{{email}}">{{email}}</a></p>
+                        </li>
+                    </ul>
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-stroked-button color="accent" [routerLink]="['/home']">Back</button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</div>

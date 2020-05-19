@@ -11,6 +11,8 @@ namespace tti_graduation_work.Application.Users.Commands.CreateUser
         {
             RuleFor(v => v.Username).NotNull();
             RuleFor(v => v.Username).NotEmpty();
+            RuleFor(v => v.Password).NotNull();
+            RuleFor(v => v.Password).NotEmpty();
         }
     }
 }
