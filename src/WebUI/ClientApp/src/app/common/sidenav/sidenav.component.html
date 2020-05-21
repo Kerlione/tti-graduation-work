@@ -9,5 +9,7 @@
         </button>
     </div>
     <a mat-list-item routerLink="/profile">Welcome, {{getName()}}</a>
-    <a mat-list-item [routerLink]="link.path" *ngFor="let link of links"> {{ link.name }} </a>
+    <div *ngFor="let link of links">
+        <a mat-list-item [routerLink]="link.path" *ngIf="link.allowed"> {{ link.name }} </a>
+    </div>
 </mat-nav-list>

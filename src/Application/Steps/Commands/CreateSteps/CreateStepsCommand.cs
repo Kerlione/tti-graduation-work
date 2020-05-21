@@ -51,15 +51,15 @@ namespace tti_graduation_work.Application.Steps.Commands.CreateSteps
                 case PaperType.Bachelor:
                     {
                         steps.AddRange(new List<Step> {
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisTopicApproval),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisTopicDefence),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisPreparation),
-                            Step.Generate(request.GraduationPaperId, PaperStep.RectorsOrder),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisPreDefence),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisUpload),
-                            Step.Generate(request.GraduationPaperId, PaperStep.PlagiarismCheck),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisDelivery),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisDefence)                            
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisTopicApproval),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisTopicDefence),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisPreparation),
+                            GenerateStep(request.GraduationPaperId, PaperStep.RectorsOrder),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisPreDefence),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisUpload),
+                            GenerateStep(request.GraduationPaperId, PaperStep.PlagiarismCheck),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisDelivery),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisDefence)                            
                         });
                         break;
                     }
@@ -67,17 +67,17 @@ namespace tti_graduation_work.Application.Steps.Commands.CreateSteps
                     {
                         steps.AddRange(new List<Step>
                         {
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisTopicApproval),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisTopicDefence),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisPreparation),
-                            Step.Generate(request.GraduationPaperId, PaperStep.RatSifConference),
-                            Step.Generate(request.GraduationPaperId, PaperStep.RectorsOrder),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisPreDefence),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisUpload),
-                            Step.Generate(request.GraduationPaperId, PaperStep.PlagiarismCheck),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisReview),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisDelivery),
-                            Step.Generate(request.GraduationPaperId, PaperStep.ThesisDefence)
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisTopicApproval),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisTopicDefence),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisPreparation),
+                            GenerateStep(request.GraduationPaperId, PaperStep.RatSifConference),
+                            GenerateStep(request.GraduationPaperId, PaperStep.RectorsOrder),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisPreDefence),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisUpload),
+                            GenerateStep(request.GraduationPaperId, PaperStep.PlagiarismCheck),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisReview),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisDelivery),
+                            GenerateStep(request.GraduationPaperId, PaperStep.ThesisDefence)
                         });
                         break;
                     }
@@ -87,6 +87,16 @@ namespace tti_graduation_work.Application.Steps.Commands.CreateSteps
                     }
             }
             return steps;
+        }
+
+        private Step GenerateStep(int paperId, PaperStep step)
+        {
+            return new Step
+            {
+                StepStatus = StepStatus.ToDo,
+                StepType = step,
+                GraduationPaperId = paperId,
+            };
         }
     }
 }

@@ -15,15 +15,5 @@ namespace tti_graduation_work.Domain.Entities
         public string Comment { get; set; }
         public int GraduationPaperId { get; set; }
         public GraduationPaper GraduationPaper { get; set; }
-
-        public static Step Generate(int paperId, PaperStep stepType)
-        {
-            return new Step
-            {
-                StepStatus = StepStatus.ToDo,
-                StepType = stepType,
-                GraduationPaperId = paperId,
-            };
-        }
     }
 }

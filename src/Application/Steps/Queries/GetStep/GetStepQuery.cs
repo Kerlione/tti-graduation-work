@@ -49,7 +49,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetStep
                 throw new NotAccessibleEntityException($"Step with id {request.StepId} is not assigned to graduation paper with id {request.GraduationPaperId}");
             }
 
-            var attachments = _context.Attachements.Where(x=>x.StepId == request.StepId).ProjectTo<AttachmentDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
+            var attachments = _context.Attachements.Where(x => x.StepId == request.StepId).ProjectTo<AttachmentDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
 
 
             return new StepDto

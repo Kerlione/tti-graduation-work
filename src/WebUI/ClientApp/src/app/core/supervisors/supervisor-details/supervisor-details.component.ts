@@ -10,6 +10,7 @@ import { AddDialogComponent } from './dialogs/add-dialog/add-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { EditDialogComponent } from './dialogs/edit-dialog/edit-dialog.component';
 import { UpdateStudentLimitComponent } from './dialogs/update-student-limit/update-student-limit.component';
+import { Administrator } from 'src/app/models/user-role';
 
 @Component({
   selector: 'app-supervisor-details',
@@ -30,13 +31,14 @@ export class SupervisorDetailsComponent implements AfterViewInit, OnInit {
   supervisorId: number;
   supervisor: SupervisorDto;
   isDataLoading = true;
+  administratorRole = Administrator;
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['titleEn', 'titleRu', 'titleLv', 'actions'];
 
   constructor(private supervisorClient: SupervisorsClient,
     private route: ActivatedRoute,
     private notificationService: NotificationService,
-    private userService: UserService,
+    public userService: UserService,
     public dialog: MatDialog) {
 
   }
@@ -54,7 +56,6 @@ export class SupervisorDetailsComponent implements AfterViewInit, OnInit {
           this.interestsDs = new MatTableDataSource(this.interests);
           this.interestsDs.paginator = this.interestsPaginator;
           this.supervisor = result;
-          console.log(this.supervisor);
           this.isDataLoading = false;
         }
       }, error => {
@@ -213,9 +214,14 @@ export class SupervisorDetailsComponent implements AfterViewInit, OnInit {
           }
         }, error => {
           this.notificationService.error(error);
-        })
+        });
       }
-    })
+    });
+  }
+
+  public allowEdit(): boolean {
+    let entityId = this.userService.getUserId();
+    return entityId == this.supervisorId;
   }
 }
 

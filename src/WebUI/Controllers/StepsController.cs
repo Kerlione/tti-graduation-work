@@ -66,13 +66,13 @@ namespace tti_graduation_work.WebUI.Controllers
                 using (var ms = new MemoryStream())
                 {
                     file.CopyTo(ms);
-                    var fileBytes = ms.ToArray();
+                    var fileBytes = Convert.ToBase64String(ms.ToArray());
                     await Mediator.Send(new UploadAttachmentCommand
                     {
                         GraduationPaperId = id,
                         StepId = stepId,
                         Name = file.FileName,
-                        Data = fileBytes
+                        Data = Convert.FromBase64String(fileBytes)
                     });
                 }
             }

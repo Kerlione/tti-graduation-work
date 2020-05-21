@@ -44,21 +44,37 @@ import { UpdateStudentLimitComponent } from './core/supervisors/supervisor-detai
 import { AuthorizeInterceptor } from './services/authorize.interceptor';
 import { UsersTableComponent } from './core/users/users-table/users-table.component';
 import { ProfileComponent } from './core/profile/profile.component';
+import { RoleGuardService } from './services/role-guard.service';
+import { AuthGuardService } from './services/auth-guard.service';
+import { Administrator, Supervisor, Student } from './models/user-role';
 
 
 const appRoutes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: '/login' },
   { path: 'login', pathMatch: 'full', component: LoginComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'view/graduation-papers', component: GraduationPapersTableComponent },
-  { path: 'view/graduation-papers/:id/details', component: GraduationPapersDetailsComponent },
-  { path: 'view/graduation-papers/:id/step/:stepId', component: StepFormComponent },
-  { path: 'graduation-paper/start', component: StepFormComponent },
-  { path: 'view/students', component: StudentsTableComponent },
-  { path: 'view/supervisors', component: SupervisorsTableComponent },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
+  { path: 'view/graduation-papers', component: GraduationPapersTableComponent, canActivate: [AuthGuardService] },
+  { path: 'view/graduation-papers/:id/details', component: GraduationPapersDetailsComponent, canActivate: [AuthGuardService] },
+  { path: 'view/graduation-papers/:id/step/:stepId', component: StepFormComponent, canActivate: [AuthGuardService] },
+  {
+    path: 'graduation-paper/start', component: StepFormComponent, canActivate: [RoleGuardService], data: {
+      expectedRole: Student
+    }
+  },
+  {
+    path: 'view/students', component: StudentsTableComponent, canActivate: [RoleGuardService],
+    data: {
+      expectedRole: Supervisor
+    }
+  },
+  { path: 'view/supervisors', component: SupervisorsTableComponent, canActivate: [AuthGuardService] },
   { path: 'view/supervisors/:id/details', component: SupervisorDetailsComponent },
-  { path: 'view/users', component: UsersTableComponent },
-  { path: 'profile', component: ProfileComponent }
+  {
+    path: 'view/users', component: UsersTableComponent, canActivate: [RoleGuardService], data: {
+      expectedRole: Administrator
+    }
+  },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardService] }
 ]
 
 @NgModule({

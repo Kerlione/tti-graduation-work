@@ -87,26 +87,6 @@ public class Testing
 
     private static string _currentUserId;
 
-    public static async Task<string> RunAsDefaultUserAsync()
-    {
-        return await RunAsUserAsync("test@local", "Testing1234!");
-    }
-
-    public static async Task<string> RunAsUserAsync(string userName, string password)
-    {
-        using var scope = _scopeFactory.CreateScope();
-
-        var userManager = scope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
-
-        var user = new ApplicationUser { UserName = userName, Email = userName };
-
-        var result = await userManager.CreateAsync(user, password);
-
-        _currentUserId = user.Id;
-
-        return _currentUserId;
-    }
-
     public static async Task ResetState()
     {
         await _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));

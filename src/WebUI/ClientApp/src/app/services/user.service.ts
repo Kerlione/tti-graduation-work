@@ -9,32 +9,22 @@ export class UserService {
 
   constructor() { }
 
-  /**
-   * storeToken
-token:string   */
   public storeToken(token: string) {
     const helper = new JwtHelperService();
-
     const decodedToken = helper.decodeToken(token);
     localStorage.setItem('currentUser', JSON.stringify({ token: decodedToken }));
     localStorage.setItem('pureToken', token);
   }
 
-  /**
-   * getToken
-   */
   public getTokenData(): any {
     return JSON.parse(localStorage.getItem('currentUser')).token;
   }
 
-  /**
-   * getToken
-   */
   public getToken(): string {
     return localStorage.getItem('pureToken');
   }
 
-  public userRole(): UserRole {
+  public userRole(): string {
     return this.getTokenData().role;
   }
 
@@ -46,5 +36,13 @@ token:string   */
 
   public getGivenName(): string {
     return this.getTokenData().given_name;
+  }
+
+  public roleAssigned(role: UserRole): boolean {
+    return this.userRole() === role.name;
+  }
+
+  public getUserId(): number {
+    return this.getTokenData().nameid;
   }
 }

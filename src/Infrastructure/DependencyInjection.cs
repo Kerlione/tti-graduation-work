@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using tti_graduation_work.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using tti_graduation_work.Infrastructure.NewsFeed;
+using tti_graduation_work.Infrastructure.Notifications;
 
 namespace tti_graduation_work.Infrastructure
 {

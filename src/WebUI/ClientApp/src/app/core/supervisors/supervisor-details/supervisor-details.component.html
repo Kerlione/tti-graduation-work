@@ -26,7 +26,7 @@
                     <p class="details-row">Student Limit: {{supervisor.studentLimit}}</p>
                 </mat-card-content>
                 <mat-card-actions>
-                    <button mat-stroked-button (click)="updateStudentLimit()">Update student limit</button>
+                    <button mat-stroked-button *ngIf="userService.roleAssigned(administratorRole)" (click)="updateStudentLimit()">Update student limit</button>
                 </mat-card-actions>
             </mat-card>
         </div>
@@ -36,7 +36,7 @@
                     <h2 class="subtitle">Fields of Interest</h2>
                 </div>
                 <div class="col-sm-2">
-                    <button mat-icon-button color="primary" aria-label="Add new field" (click)="addField()">
+                    <button mat-icon-button color="primary" aria-label="Add new field" (click)="addField()" *ngIf="allowEdit()">
                         <mat-icon>add</mat-icon>
                       </button>
                 </div>
@@ -65,8 +65,8 @@
                     <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
                         <td mat-cell *matCellDef="let row">
-                            <button mat-button color="primary" (click)="editField(row)">Edit</button>
-                            <button mat-button color="primary" (click)="deleteField(row.id)">Delete</button>
+                            <button mat-button color="primary" (click)="editField(row)" *ngIf="allowEdit()">Edit</button>
+                            <button mat-button color="primary" (click)="deleteField(row.id)" *ngIf="allowEdit()">Delete</button>
                         </td>
                     </ng-container>
 
@@ -84,7 +84,7 @@
                     <h2 class="subtitle">Topics</h2>
                 </div>
                 <div class="col-sm-2">
-                    <button mat-icon-button color="primary" aria-label="Add new topic" (click)="addTopic()">
+                    <button mat-icon-button color="primary" aria-label="Add new topic" (click)="addTopic()" *ngIf="allowEdit()">
                         <mat-icon>add</mat-icon>
                       </button>
                 </div>
@@ -114,8 +114,8 @@
                     <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
                         <td mat-cell *matCellDef="let row">
-                            <button mat-button color="primary" (click)="editTopic(row)">Edit</button>
-                            <button mat-button color="primary" (click)="deleteTopic(row.id)">Delete</button>
+                            <button mat-button color="primary" (click)="editTopic(row)" *ngIf="allowEdit()">Edit</button>
+                            <button mat-button color="primary" (click)="deleteTopic(row.id)" *ngIf="allowEdit()">Delete</button>
                         </td>
                     </ng-container>
 

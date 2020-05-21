@@ -9,7 +9,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from 'src/app/services/user.service';
-import { UserRole } from 'src/app/models/user-role';
+import { UserRole, Supervisor, Student } from 'src/app/models/user-role';
 import { NotificationService } from 'src/app/services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RejectDialogComponent } from './reject-dialog/reject-dialog.component';
@@ -78,9 +78,19 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
   ngAfterViewInit() {
   }
 
+  public allowNotify(row: StepDto): boolean {
+    if (this.userService.roleAssigned(Student)) {
+      return row.stepStatus === 2;
+    } else {
+      if (this.userService.roleAssigned(Supervisor)) {
+        return row.stepStatus < 2 || row.stepStatus !== 5;
+      }
+    }
+  }
+
   public notify(id: number) {
     let stepId: number = this.dataSource[id].id;
-    if (this.userService.userRole() === UserRole.Student) {
+    if (this.userService.roleAssigned(Student)) {
       this.stepsClient.notifySupervisor(this.paperId,
         NotifySupervisorCommand.fromJS({ graduationPaperId: this.paperId, stepId: stepId })).subscribe(result => {
           this.notificationService.success('Supervisor notified');
@@ -89,7 +99,7 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
             this.notificationService.error(error);
           });
     } else {
-      if (this.userService.userRole() === UserRole.Supervisor) {
+      if (this.userService.roleAssigned(Supervisor)) {
         this.stepsClient.notifyStudent(this.paperId,
           NotifyStudentCommand.fromJS({ graduationPaperId: this.paperId, stepId: stepId })).subscribe(result => {
             this.notificationService.success('Student notified');
@@ -176,5 +186,5 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
     const percentage = 100 / this.dataSource.length * this.dataSource.filter(x => x.stepStatus === 5).length;
     return percentage;
   }
-  
+
 }

@@ -24,7 +24,6 @@ namespace tti_graduation_work.Application.Students.Commands
         public int FacultyId { get; set; }
         public int Form { get; set; }
         public string Language { get; set; }
-
         public int UserId { get; set; }
     }
 

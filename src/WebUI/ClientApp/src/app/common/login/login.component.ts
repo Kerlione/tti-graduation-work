@@ -57,7 +57,6 @@ export class LoginComponent implements OnInit {
         const password = this.form.get('password').value;
         this.authenticationClient.login(AuthenticateUserCommand.fromJS({ username: username, password: password })).subscribe(result => {
           if (result) {
-            console.log(result.token);
             this.userService.storeToken(result.token);
             this.router.navigate([this.returnUrl]);
           }

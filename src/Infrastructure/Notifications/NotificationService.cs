@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using tti_graduation_work.Application.Common.Interfaces;
 using tti_graduation_work.Infrastructure.Email;
 
-namespace tti_graduation_work.Infrastructure.Services
+namespace tti_graduation_work.Infrastructure.Notifications
 {
     public class NotificationService : INotificationService
     {

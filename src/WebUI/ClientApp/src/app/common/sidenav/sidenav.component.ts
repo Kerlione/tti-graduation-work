@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { Router } from '@angular/router';
+import { UserRole, Administrator, Student, Supervisor } from 'src/app/models/user-role';
 
 export interface Section {
   name: string;
   path: string;
+  allowed: boolean;
 }
 
 @Component({
@@ -18,27 +20,33 @@ export class SidenavComponent implements OnInit {
   links: Section[] = [
     {
       name: 'Home',
-      path: '/home'
+      path: '/home',
+      allowed: true
     },
     {
       name: 'Graduation Papers',
-      path: '/view/graduation-papers'
+      path: '/view/graduation-papers',
+      allowed: this.userService.roleAssigned(Supervisor) || this.userService.roleAssigned(Administrator),
     },
     {
       name: 'Students',
-      path: '/view/students'
+      path: '/view/students',
+      allowed: this.userService.roleAssigned(Supervisor)
     },
     {
       name: 'Graduation Paper',
-      path: '/graduation-paper/start'
+      path: '/graduation-paper/start',
+      allowed: this.userService.roleAssigned(Student)
     },
     {
       name: 'Supervisors',
-      path: '/view/supervisors'
+      path: '/view/supervisors',
+      allowed: this.authService.checkAuthenticated()
     },
     {
       name: 'Users',
-      path: '/view/users'
+      path: '/view/users',
+      allowed: this.userService.roleAssigned(Administrator)
     }
   ];
 
@@ -50,7 +58,6 @@ export class SidenavComponent implements OnInit {
   }
 
   public logout() {
-    console.log(this.userService);
     if (this.authService.checkAuthenticated()) {
       this.userService.clearData();
     }
