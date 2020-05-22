@@ -18,7 +18,7 @@ namespace tti_graduation_work.Application.GraduationPapers.Queries.GetPaper
         public void Mapping(Profile profile)
         {
             profile.CreateMap<GraduationPaper, GraduationPaperDto>()
-                .ForMember(dto => dto.Supervisor, opt => opt.MapFrom(p => p.SupervisorId != 0 ? $"{p.Supervisor.Name} {p.Supervisor.Surname}": "None"));
+                .ForMember(dto => dto.Supervisor, opt => opt.MapFrom(p => p.SupervisorId.HasValue ? $"{p.Supervisor.Name} {p.Supervisor.Surname}": "None"));
         }
     }
 }

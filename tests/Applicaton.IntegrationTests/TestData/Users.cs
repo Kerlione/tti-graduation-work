@@ -14,10 +14,19 @@ namespace tti_graduation_work.Application.IntegrationTests.TestData
             Administrator
         }
 
-        public static CreateUserCommand StudentUser =>
+        public static CreateUserCommand Student1User =>
             new CreateUserCommand
             {
                 Username = "student1",
+                Password = "test1",
+                Role = (int)Roles.Student
+            };
+
+
+        public static CreateUserCommand Student2User =>
+            new CreateUserCommand
+            {
+                Username = "student2",
                 Password = "test1",
                 Role = (int)Roles.Student
             };

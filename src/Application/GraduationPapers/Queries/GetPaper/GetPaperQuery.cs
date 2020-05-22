@@ -29,7 +29,7 @@ namespace tti_graduation_work.Application.GraduationPapers.Queries.GetPaper
 
         public async Task<GraduationPaperDto> Handle(GetPaperQuery request, CancellationToken cancellationToken)
         {
-            var entity = await _context.GraduationPapers.FirstOrDefaultAsync(x => x.StudentId == request.StudentId);
+            var entity = await _context.GraduationPapers.Include(p => p.Supervisor).FirstOrDefaultAsync(x => x.StudentId == request.StudentId);
 
             return _mapper.Map<GraduationPaperDto>(entity);
         }

@@ -1827,6 +1827,14 @@
             "items": {
               "$ref": "#/components/schemas/AttachmentDto"
             }
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2034,6 +2042,10 @@
             "items": {
               "$ref": "#/components/schemas/StudentDto"
             }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

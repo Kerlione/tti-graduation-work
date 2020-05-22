@@ -103,6 +103,15 @@ public class Testing
         return await context.FindAsync<T>(id);
     }
 
+    public static async Task<T> FirstOrDefault<T>() where T: class
+    {
+        using var scope = _scopeFactory.CreateScope();
+
+        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+
+        return await context.Set<T>().FirstOrDefaultAsync();
+    }
+
     [OneTimeTearDown]
     public void RunAfterAnyTests()
     {

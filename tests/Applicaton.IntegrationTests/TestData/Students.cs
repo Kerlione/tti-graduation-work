@@ -31,5 +31,30 @@ namespace tti_graduation_work.Application.IntegrationTests.TestData
             Skype = "test1",
             Status = "Active"
         };
+
+        public static CreateStudentCommand Student2(int facultyId, int programeId, int userId) => new CreateStudentCommand
+        {
+            ExternalId = 2,
+            Comments = "",
+            Emails = new List<string>
+            {
+                "testmail1@test.test",
+                "testmail2@test.test"
+            },
+            FacultyId = facultyId,
+            UserId = userId,
+            Form = 1,
+            Language = "RU",
+            Name = "Test",
+            Surname = "Student 2",
+            Phones = new List<string>
+            {
+                "+311111111111111",
+                "+322222222222222"
+            },
+            ProgrameId = programeId,
+            Skype = "test2",
+            Status = "Active"
+        };
     }
 }

@@ -3031,6 +3031,8 @@ export class StepDto2 implements IStepDto2 {
     stepStatus?: number;
     data?: string | undefined;
     attachments?: AttachmentDto[] | undefined;
+    comment?: string | undefined;
+    studentId?: number;
 
     constructor(data?: IStepDto2) {
         if (data) {
@@ -3052,6 +3054,8 @@ export class StepDto2 implements IStepDto2 {
                 for (let item of _data["attachments"])
                     this.attachments!.push(AttachmentDto.fromJS(item));
             }
+            this.comment = _data["comment"];
+            this.studentId = _data["studentId"];
         }
     }
 
@@ -3073,6 +3077,8 @@ export class StepDto2 implements IStepDto2 {
             for (let item of this.attachments)
                 data["attachments"].push(item.toJSON());
         }
+        data["comment"] = this.comment;
+        data["studentId"] = this.studentId;
         return data; 
     }
 }
@@ -3083,6 +3089,8 @@ export interface IStepDto2 {
     stepStatus?: number;
     data?: string | undefined;
     attachments?: AttachmentDto[] | undefined;
+    comment?: string | undefined;
+    studentId?: number;
 }
 
 export class AttachmentDto implements IAttachmentDto {
@@ -3531,6 +3539,7 @@ export interface ICreateStudentCommand {
 
 export class StudentsVm implements IStudentsVm {
     students?: StudentDto[] | undefined;
+    total?: number;
 
     constructor(data?: IStudentsVm) {
         if (data) {
@@ -3548,6 +3557,7 @@ export class StudentsVm implements IStudentsVm {
                 for (let item of _data["students"])
                     this.students!.push(StudentDto.fromJS(item));
             }
+            this.total = _data["total"];
         }
     }
 
@@ -3565,12 +3575,14 @@ export class StudentsVm implements IStudentsVm {
             for (let item of this.students)
                 data["students"].push(item.toJSON());
         }
+        data["total"] = this.total;
         return data; 
     }
 }
 
 export interface IStudentsVm {
     students?: StudentDto[] | undefined;
+    total?: number;
 }
 
 export class StudentDto implements IStudentDto {

@@ -58,6 +58,7 @@ export class LoginComponent implements OnInit {
         this.authenticationClient.login(AuthenticateUserCommand.fromJS({ username: username, password: password })).subscribe(result => {
           if (result) {
             this.userService.storeToken(result.token);
+            this.userService.authorizationEvent.emit('user authorized');
             this.router.navigate([this.returnUrl]);
           }
         },

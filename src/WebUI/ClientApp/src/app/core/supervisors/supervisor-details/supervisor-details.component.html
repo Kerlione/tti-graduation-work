@@ -1,4 +1,7 @@
-<div class="mat-elevation-z8">
+<div class="col-sm-12">
+    <app-loading-panel [isDataLoading]="isDataLoading"></app-loading-panel>
+</div>
+<div class="mat-elevation-z8" *ngIf="!isDataLoading">
     <h2 class="title">Supervisor profile</h2>
     <div class="row">
         <div class="col-sm-4">

@@ -47,6 +47,7 @@ import { ProfileComponent } from './core/profile/profile.component';
 import { RoleGuardService } from './services/role-guard.service';
 import { AuthGuardService } from './services/auth-guard.service';
 import { Administrator, Supervisor, Student } from './models/user-role';
+import { LoadingPanelComponent } from './common/loading-panel/loading-panel.component';
 
 
 const appRoutes: Routes = [
@@ -96,7 +97,8 @@ const appRoutes: Routes = [
     DeleteDialogComponent,
     UpdateStudentLimitComponent,
     UsersTableComponent,
-    ProfileComponent
+    ProfileComponent,
+    LoadingPanelComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

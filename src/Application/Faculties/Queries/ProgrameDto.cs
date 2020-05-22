@@ -6,7 +6,7 @@ using tti_graduation_work.Domain.Entities;
 
 namespace tti_graduation_work.Application.Faculties.Queries
 {
-    public class ProgrameDto
+    public class ProgrameDto: IMapFrom<Programe>
     {
         public int Id { get; set; }
         public string Title_RU { get; set; }

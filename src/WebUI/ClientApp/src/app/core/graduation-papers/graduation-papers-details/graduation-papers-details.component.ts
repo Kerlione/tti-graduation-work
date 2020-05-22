@@ -187,4 +187,7 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
     return percentage;
   }
 
+  public isPaperSupervisor(): boolean {
+    return this.userService.getUserId() === this.graduationPaper.supervisorId;
+  }
 }

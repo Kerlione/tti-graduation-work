@@ -29,7 +29,7 @@ namespace tti_graduation_work.Application.Steps.Commands.CreateSteps
 
         public async Task<Unit> Handle(CreateStepsCommand request, CancellationToken cancellationToken)
         {
-            var paper = _context.GraduationPapers.FindAsync(request.GraduationPaperId);
+            var paper = await _context.GraduationPapers.FindAsync(request.GraduationPaperId);
 
             if (paper == null)
             {

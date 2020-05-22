@@ -5,11 +5,12 @@ import { QuestionBase } from 'src/app/models/question-base';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   StepsClient, StepDto2, UpdateStepCommand, SendStepToReviewCommand,
-  FinishStepCommand, GraduationPaperClient, FileParameter
+  FinishStepCommand, GraduationPaperClient, FileParameter, AttachmentDto
 } from 'src/app/tti_graduation_work-api';
 import { FormGeneratorService } from 'src/app/services/form-generator.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { StepData } from 'src/app/models/step-data';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-step-form',
@@ -31,6 +32,7 @@ export class StepFormComponent implements OnInit {
   noPaper: boolean = false;
   fileToUpload: File = null;
   fileUrl;
+  isDataLoading: boolean = true;
   dataLoaded: Promise<boolean>;
   constructor(
     private sfs: StepFormService,
@@ -39,7 +41,8 @@ export class StepFormComponent implements OnInit {
     private fgs: FormGeneratorService,
     private notificationService: NotificationService,
     private graduationPaperClient: GraduationPaperClient,
-    private router: Router) { }
+    private router: Router,
+    private userService: UserService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -70,7 +73,6 @@ export class StepFormComponent implements OnInit {
                 this.stepData.stepStatus === 2 || this.stepData.stepStatus === 3 || this.stepData.stepStatus === 5);
               if (this.stepDataModel.isForm) {
                 this.form = this.sfs.toFormGroup(this.stepDataModel.formData);
-                console.log(this.stepData.data);
                 this.form.setValue(JSON.parse(this.stepData.data));
               }
               if (this.stepData.stepStatus === 2 || this.stepData.stepStatus === 3 || this.stepData.stepStatus === 5) {
@@ -78,6 +80,7 @@ export class StepFormComponent implements OnInit {
               }
               //this.dataLoaded = Promise.resolve(true);
             }
+            this.isDataLoading = false;
           });
         }
       },
@@ -151,11 +154,19 @@ export class StepFormComponent implements OnInit {
       this.fileUrl = event.target.result;
     };
 
-    let fileParam: FileParameter = {data: this.fileToUpload, fileName: this.fileToUpload.name};
+    let fileParam: FileParameter = { data: this.fileToUpload, fileName: this.fileToUpload.name };
     this.stepsClient.uploadAttachment(this.paperId, this.stepId, fileParam).subscribe(result => {
 
     });
 
     return;
+  }
+
+  public isStudentsStep(): boolean {
+    return this.userService.getUserId() == this.stepData.studentId;
+  }
+
+  public download(attachment: AttachmentDto) {
+    console.log(attachment);
   }
 }

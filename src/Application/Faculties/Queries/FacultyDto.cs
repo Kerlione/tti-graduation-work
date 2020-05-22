@@ -7,7 +7,7 @@ using tti_graduation_work.Domain.Entities;
 
 namespace tti_graduation_work.Application.Faculties.Queries
 {
-    public class FacultyDto
+    public class FacultyDto: IMapFrom<Faculty>
     {
         public int Id { get; set; }
         public int ExternalId { get; set; }

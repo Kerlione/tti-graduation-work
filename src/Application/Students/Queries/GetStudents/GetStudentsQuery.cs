@@ -15,7 +15,7 @@ namespace tti_graduation_work.Application.Students.Queries.GetStudents
 
 	public class GetStudentsQuery : IRequest<StudentsVm>
 	{
-		public int From { get; set; }
+		public int Skip { get; set; }
 		public int Take { get; set; }
 	}
 
@@ -36,7 +36,8 @@ namespace tti_graduation_work.Application.Students.Queries.GetStudents
 			{
 				Students = await _context.Students.ProjectTo<StudentDto>(_mapper.ConfigurationProvider)
 				.OrderBy(s => s.Id)
-				.ToListAsync(cancellationToken)
+				.ToListAsync(cancellationToken),
+				Total = _context.Students.Count()
 			};
 		}
 	}

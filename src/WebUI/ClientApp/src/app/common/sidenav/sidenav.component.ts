@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { Router } from '@angular/router';
@@ -17,44 +17,16 @@ export interface Section {
 })
 export class SidenavComponent implements OnInit {
 
-  links: Section[] = [
-    {
-      name: 'Home',
-      path: '/home',
-      allowed: true
-    },
-    {
-      name: 'Graduation Papers',
-      path: '/view/graduation-papers',
-      allowed: this.userService.roleAssigned(Supervisor) || this.userService.roleAssigned(Administrator),
-    },
-    {
-      name: 'Students',
-      path: '/view/students',
-      allowed: this.userService.roleAssigned(Supervisor)
-    },
-    {
-      name: 'Graduation Paper',
-      path: '/graduation-paper/start',
-      allowed: this.userService.roleAssigned(Student)
-    },
-    {
-      name: 'Supervisors',
-      path: '/view/supervisors',
-      allowed: this.authService.checkAuthenticated()
-    },
-    {
-      name: 'Users',
-      path: '/view/users',
-      allowed: this.userService.roleAssigned(Administrator)
-    }
-  ];
-
+  links: Section[] = this.userService.getMenuSections();
+  subscription: any;
   constructor(public authService: AuthService,
     public userService: UserService,
     public router: Router) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.subscription = this.userService.authorizationEvent.subscribe(res => {
+      this.links = this.userService.getMenuSections();
+    });
   }
 
   public logout() {

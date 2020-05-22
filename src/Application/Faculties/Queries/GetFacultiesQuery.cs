@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,22 +14,33 @@ namespace tti_graduation_work.Application.Faculties.Queries
 
     public class GetFacultiesQuery : IRequest<FacultiesVm>
     {
+        public int Take { get; set; }
+        public int Skip { get; set; }
     }
 
     public class GetFacultiesQueryHandler : IRequestHandler<GetFacultiesQuery, FacultiesVm>
     {
         private IApplicationDbContext _context;
+        private IMapper _mapper;
 
-        public GetFacultiesQueryHandler(IApplicationDbContext context)
+        public GetFacultiesQueryHandler(IApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<FacultiesVm> Handle(GetFacultiesQuery message, CancellationToken cancellationToken)
         {
-            var entities = await _context.Faculties.Include(prog => prog.Programes).ToListAsync(cancellationToken);
+            if(message.Take == 0)
+            {
+                message.Take = 15;
+            }
 
-            return new FacultiesVm();
+            return new FacultiesVm
+            {
+                Faculties = await _context.Faculties.Include(prog => prog.Programes)
+                    .ProjectTo<FacultyDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)
+            };
         }
     }
 }

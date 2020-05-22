@@ -90,13 +90,16 @@ namespace tti_graduation_work.Application.Steps.Commands.SendStepToReviewRequest
 
             var supervisor = _context.Supervisors.Include(s => s.GraduationPapers).FirstOrDefault(x => x.Id == updatedData.SupervisorId);
 
-            if (supervisor != null)
+            if (supervisor == null)
             {
-                if (supervisor.GraduationPapers.Count(x=>x.PaperStatus == PaperStatus.InProgress) >= supervisor.StudentLimit)
+                throw new NotFoundException($"Supervisor with id {updatedData.SupervisorId} not found");
+            }
+            else
+            {
+                if (supervisor.GraduationPapers.Count(x => x.PaperStatus == PaperStatus.InProgress) >= supervisor.StudentLimit)
                 {
                     throw new Exception($"Supervisor student limit is exceeded");
                 }
-
             }
 
             paper.SupervisorId = updatedData.SupervisorId;
