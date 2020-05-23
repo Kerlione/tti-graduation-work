@@ -17,13 +17,16 @@ using tti_graduation_work.Application.Steps.Commands.UploadAttachment;
 using tti_graduation_work.Application.Steps.Queries.GetAvailableSupervisors;
 using tti_graduation_work.Application.Steps.Queries.GetStep;
 using tti_graduation_work.Application.Steps.Queries.GetSteps;
+using tti_graduation_work.WebUI.Attributes;
+using tti_graduation_work.WebUI.Enums;
 using SingleStep = tti_graduation_work.Application.Steps.Queries.GetStep.StepDto;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class StepsController : ApiController
     {
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost("NotifyStudent/{id}")]
         public async Task<ActionResult> NotifyStudent(int id, NotifyStudentCommand request)
         {
@@ -35,6 +38,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
+        [RoleRequirementAttribute(UserRole.Student)]
         [HttpPost("NotifySupervisor/{id}")]
         public async Task<ActionResult> NotifySupervisor(int id, NotifySupervisorCommand request)
         {
@@ -58,6 +62,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(new GetStepQuery { GraduationPaperId = id, StepId = stepId });
         }
 
+        [RoleRequirementAttribute(UserRole.Student)]
         [HttpPost("{id}/Step/{stepId}/Attachment")]
         public async Task<ActionResult<int>> UploadAttachment(int id, int stepId, IFormFile file)
         {
@@ -79,6 +84,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Student)]
         [HttpPut("Step/{stepId}/Update")]
         public async Task<ActionResult> UpdateStep(int stepId, UpdateStepCommand request)
         {
@@ -92,6 +98,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost("{id}/Step/{stepId}/Approve")]
         public async Task<ActionResult> ApproveStep(int id, int stepId, ApproveStepCommand request)
         {
@@ -110,6 +117,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost("{id}/Step/{stepId}/Reject")]
         public async Task<ActionResult> RejectStep(int id, int stepId, RejectStepCommand request)
         {
@@ -128,6 +136,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Student)]
         [HttpPost("{id}/Step/{stepId}/Finish")]
         public async Task<ActionResult> FinishStep(int id, int stepId, FinishStepCommand request)
         {
@@ -152,6 +161,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(new GetAvailableSupervisorsQuery());
         }
 
+        [RoleRequirementAttribute(UserRole.Student)]
         [HttpPost("{id}/Step/{stepId}/ToReview")]
         public async Task<ActionResult> SendToReview(int id, int stepId, SendStepToReviewCommand request)
         {

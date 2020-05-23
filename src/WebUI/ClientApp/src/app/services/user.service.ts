@@ -56,7 +56,6 @@ export class UserService {
 
 
   public getMenuSections(): Section[] {
-    console.log('Updated menu');
     return [
       {
         name: 'Home',

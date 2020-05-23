@@ -1,7 +1,7 @@
 <div class="col-sm-12">
     <app-loading-panel [isDataLoading]="isDataLoading"></app-loading-panel>
 </div>
-<div class="mat-elevation-z8">
+<div class="mat-elevation-z8" *ngIf="!isDataLoading">
     <h2>Graduation Papers</h2>
     <table mat-table class="full-width-table" matSort aria-label="Graduation Papers" [dataSource]="tableDs">
         <ng-container matColumnDef="id">

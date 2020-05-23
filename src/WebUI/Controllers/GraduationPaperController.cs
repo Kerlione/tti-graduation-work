@@ -17,9 +17,10 @@ using tti_graduation_work.WebUI.Filters;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
+    [Authorize]
     public class GraduationPaperController : ApiController
     {
-        //[RoleRequirementAttribute(UserRole.Supervisor)]
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost]
         public async Task<ActionResult<GraduationPapersVm>> Get(GetGraduationPapersQuery request)
         {

@@ -16,12 +16,13 @@ using tti_graduation_work.Application.Topics.Commands.DeleteTopic;
 using tti_graduation_work.Application.Topics.Commands.UpdateTopic;
 using tti_graduation_work.Application.Users.Commands.CreateUser;
 using tti_graduation_work.Application.Users.Queries.GetUser;
+using tti_graduation_work.WebUI.Attributes;
 using tti_graduation_work.WebUI.Enums;
 using SingleSupervisor = tti_graduation_work.Application.Supervisors.Queries.GetSupervisor.SupervisorDto;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class SupervisorsController : ApiController
     {
         [HttpPost("{id}/Profile")]
@@ -52,6 +53,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(request);
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPut("{id}/AddTopic")]
         public async Task<ActionResult<int>> AddTopic(int id, CreateTopicCommand request)
         {
@@ -63,6 +65,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(request);
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost("{id}/UpdateTopic/{topicId}")]
         public async Task<ActionResult> UpdateTopic(int id, int topicId, UpdateTopicCommand request)
         {
@@ -81,6 +84,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpDelete("{id}/DeleteTopic/{topicId}")]
         public async Task<ActionResult> DeleteTopic(int id, int topicId, DeleteTopicCommand request)
         {
@@ -99,6 +103,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPut("{id}/AddField")]
         public async Task<ActionResult<int>> AddField(int id, CreateFieldCommand request)
         {
@@ -110,6 +115,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(request);
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpPost("{id}/UpdateField/{fieldId}")]
         public async Task<ActionResult> UpdateField(int id, int fieldId, UpdateFieldCommand request)
         {
@@ -128,6 +134,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return Ok();
         }
 
+        [RoleRequirementAttribute(UserRole.Supervisor)]
         [HttpDelete("{id}/DeleteField/{fieldId}")]
         public async Task<ActionResult> DeleteField(int id, int fieldId, DeleteFieldCommand request)
         {
@@ -152,6 +159,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return await Mediator.Send(request);
         }
 
+        [RoleRequirementAttribute(UserRole.Administrator)]
         [HttpPost("{id}/UpdateLimit")]
         public async Task<ActionResult> UpdateStudentLimit(int id, UpdateStudentLimitCommand request)
         {

@@ -18,7 +18,7 @@ export class StudentsTableComponent implements AfterViewInit, OnInit {
   isDataLoading = true;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['firstName', 'lastName', 'faculty', 'programe'];
+  displayedColumns = ['firstName', 'lastName', 'faculty', 'programe', 'actions'];
 
   constructor(private studentsClient: StudentsClient) {
     this.studentsClient = studentsClient;

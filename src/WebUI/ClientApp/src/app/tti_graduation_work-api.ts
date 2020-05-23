@@ -1702,7 +1702,7 @@ export class SupervisorsClient implements ISupervisorsClient {
 export interface IUsersClient {
     lock(id: number, command: LockUserCommand): Observable<FileResponse>;
     unlock(id: number, command: UnlockUserCommand): Observable<FileResponse>;
-    sync(): Observable<number>;
+    sync(): Observable<FileResponse>;
     create(): Observable<FileResponse>;
     getUsers(request: GetUsersQuery): Observable<UsersVm>;
 }
@@ -1826,7 +1826,7 @@ export class UsersClient implements IUsersClient {
         return _observableOf<FileResponse>(<any>null);
     }
 
-    sync(): Observable<number> {
+    sync(): Observable<FileResponse> {
         let url_ = this.baseUrl + "/api/Users/sync";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1834,7 +1834,7 @@ export class UsersClient implements IUsersClient {
             observe: "response",
             responseType: "blob",			
             headers: new HttpHeaders({
-                "Accept": "application/json"
+                "Accept": "application/octet-stream"
             })
         };
 
@@ -1845,33 +1845,31 @@ export class UsersClient implements IUsersClient {
                 try {
                     return this.processSync(<any>response_);
                 } catch (e) {
-                    return <Observable<number>><any>_observableThrow(e);
+                    return <Observable<FileResponse>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<number>><any>_observableThrow(response_);
+                return <Observable<FileResponse>><any>_observableThrow(response_);
         }));
     }
 
-    protected processSync(response: HttpResponseBase): Observable<number> {
+    protected processSync(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
-            return _observableOf(result200);
-            }));
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<number>(<any>null);
+        return _observableOf<FileResponse>(<any>null);
     }
 
     create(): Observable<FileResponse> {
@@ -3589,8 +3587,7 @@ export class StudentDto implements IStudentDto {
     id?: number;
     firstName?: string | undefined;
     lastName?: string | undefined;
-    finishedStepCount?: number;
-    totalStepCount?: number;
+    graduationPaperId?: number;
     faculty?: string | undefined;
     programe?: string | undefined;
     studyLanguage?: string | undefined;
@@ -3610,8 +3607,7 @@ export class StudentDto implements IStudentDto {
             this.id = _data["id"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
-            this.finishedStepCount = _data["finishedStepCount"];
-            this.totalStepCount = _data["totalStepCount"];
+            this.graduationPaperId = _data["graduationPaperId"];
             this.faculty = _data["faculty"];
             this.programe = _data["programe"];
             this.studyLanguage = _data["studyLanguage"];
@@ -3631,8 +3627,7 @@ export class StudentDto implements IStudentDto {
         data["id"] = this.id;
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
-        data["finishedStepCount"] = this.finishedStepCount;
-        data["totalStepCount"] = this.totalStepCount;
+        data["graduationPaperId"] = this.graduationPaperId;
         data["faculty"] = this.faculty;
         data["programe"] = this.programe;
         data["studyLanguage"] = this.studyLanguage;
@@ -3645,8 +3640,7 @@ export interface IStudentDto {
     id?: number;
     firstName?: string | undefined;
     lastName?: string | undefined;
-    finishedStepCount?: number;
-    totalStepCount?: number;
+    graduationPaperId?: number;
     faculty?: string | undefined;
     programe?: string | undefined;
     studyLanguage?: string | undefined;

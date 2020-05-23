@@ -9,7 +9,7 @@
         </button>
     </div>
     <a mat-list-item routerLink="/profile">Welcome, {{getName()}}</a>
-    <div *ngFor="let link of links">
+    <div *ngFor="let link of userService.getMenuSections()">
         <a mat-list-item [routerLink]="link.path" *ngIf="link.allowed"> {{ link.name }} </a>
     </div>
 </mat-nav-list>

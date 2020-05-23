@@ -13,7 +13,7 @@ using tti_graduation_work.WebUI.Enums;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class StudentsController: ApiController
     {
         [HttpPost]

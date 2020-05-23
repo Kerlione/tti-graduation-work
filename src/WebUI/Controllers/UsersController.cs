@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,16 @@ using System.Threading.Tasks;
 using tti_graduation_work.Application.Users.Commands.LockUser;
 using tti_graduation_work.Application.Users.Commands.UnlockUser;
 using tti_graduation_work.Application.Users.Queries.GetUsers;
+using tti_graduation_work.Application.Users.Queries.Sync;
+using tti_graduation_work.WebUI.Attributes;
+using tti_graduation_work.WebUI.Enums;
 
 namespace tti_graduation_work.WebUI.Controllers
 {
+    [Authorize]
     public class UsersController : ApiController
     {
+        [RoleRequirementAttribute(UserRole.Administrator)]
         [HttpPut("{id}/Lock")]
         public async Task<ActionResult> Lock(int id, LockUserCommand command)
         {
@@ -24,6 +30,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
+        [RoleRequirementAttribute(UserRole.Administrator)]
         [HttpPut("{id}/Unlock")]
         public async Task<ActionResult> Unlock(int id, UnlockUserCommand command)
         {
@@ -37,12 +44,12 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
+        [RoleRequirementAttribute(UserRole.Administrator)]
         [HttpGet("sync")]
-        public async Task<ActionResult<int>> Sync()
+        public async Task<ActionResult> Sync()
         {
-            // TODO: implement sync logic
-
-            return NoContent();
+            await Mediator.Send(new SyncQuery());
+            return Ok();
         }
 
         [HttpPost("Create")]
@@ -51,6 +58,7 @@ namespace tti_graduation_work.WebUI.Controllers
             return NoContent();
         }
 
+        [RoleRequirementAttribute(UserRole.Administrator)]
         [HttpPost]
         public async Task<ActionResult<UsersVm>> GetUsers(GetUsersQuery request)
         {
