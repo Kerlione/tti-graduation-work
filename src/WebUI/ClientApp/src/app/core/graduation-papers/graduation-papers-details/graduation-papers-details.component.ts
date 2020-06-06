@@ -9,7 +9,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from 'src/app/services/user.service';
-import { UserRole, Supervisor, Student } from 'src/app/models/user-role';
+import { Supervisor, Student } from 'src/app/models/user-role';
 import { NotificationService } from 'src/app/services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RejectDialogComponent } from './reject-dialog/reject-dialog.component';
@@ -141,7 +141,7 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
-      if (result === 1) {
+      if (result !== -1) {
         this.stepsClient.rejectStep(this.paperId, stepId,
           RejectStepCommand.fromJS({ stepId: stepId, graduationPaperId: this.paperId, reason: result }))
           .subscribe(res => {
@@ -188,6 +188,6 @@ export class GraduationPapersDetailsComponent implements AfterViewInit, OnInit {
   }
 
   public isPaperSupervisor(): boolean {
-    return this.userService.getUserId() === this.graduationPaper.supervisorId;
+    return this.userService.getUserId() === this.graduationPaper.supervisorId && this.userService.roleAssigned(Supervisor);
   }
 }

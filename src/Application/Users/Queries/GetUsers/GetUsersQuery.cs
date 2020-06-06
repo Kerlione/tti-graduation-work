@@ -44,7 +44,7 @@ namespace tti_graduation_work.Application.Users.Queries.GetUsers
                 .ToList(),
                 Users = await _context.Users.Take(request.Take).Skip(request.Skip)
                 .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
-                .OrderBy(u => u.Username)
+                .OrderBy(u => u.Username).AsNoTracking()
                 .ToListAsync(cancellationToken)
             };
 

@@ -38,7 +38,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetSteps
                 throw new NotFoundException($"Graduation paper with id {request.GraduationPaperId} is not found");
             }
 
-            var steps = _context.Steps.Where(x => x.GraduationPaperId == request.GraduationPaperId).AsQueryable().ProjectTo<StepDto>(_mapper.ConfigurationProvider);
+            var steps = _context.Steps.Where(x => x.GraduationPaperId == request.GraduationPaperId).AsNoTracking().AsQueryable().ProjectTo<StepDto>(_mapper.ConfigurationProvider);
 
             return new StepsVm
             {

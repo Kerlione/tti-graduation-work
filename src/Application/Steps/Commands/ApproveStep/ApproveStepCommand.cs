@@ -57,6 +57,7 @@ namespace tti_graduation_work.Application.Steps.Commands
 			}
 
 			step.StepStatus = StepStatus.Approved;
+			step.Comment = String.Empty;
 
 			await _context.SaveChangesAsync(cancellationToken);
 

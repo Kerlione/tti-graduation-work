@@ -30,7 +30,7 @@ namespace tti_graduation_work.Application.Steps.Queries.GetAvailableSupervisors
 
 		public async Task<SupervisorsVm> Handle(GetAvailableSupervisorsQuery request, CancellationToken cancellationToken)
 		{
-			var availableSupervisors = _context.Supervisors.Include(s => s.GraduationPapers).Where(x => x.GraduationPapers.Count < x.StudentLimit);
+			var availableSupervisors = _context.Supervisors.Include(s => s.GraduationPapers).Where(x => x.GraduationPapers.Count < x.StudentLimit).AsNoTracking();
 			return new SupervisorsVm
 			{
 				List = await availableSupervisors.ProjectTo<SupervisorSm>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)

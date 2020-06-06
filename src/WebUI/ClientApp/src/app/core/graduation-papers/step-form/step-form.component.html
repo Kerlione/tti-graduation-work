@@ -2,7 +2,7 @@
     <app-loading-panel [isDataLoading]="isDataLoading && !noPaper"></app-loading-panel>
 </div>
 <div class="col-sm-12" *ngIf="stepDataModel">
-    <form (ngSubmit)="onSubmit()" [formGroup]="form" [style.fontSize.px]="15" *ngIf="stepDataModel.isForm">
+    <form [formGroup]="form" [style.fontSize.px]="15" *ngIf="stepDataModel.isForm">
 
         <div *ngFor="let question of stepDataModel.formData" class="form-row">
             <app-form-field [question]="question" [form]="form"></app-form-field>
@@ -36,14 +36,6 @@
                 </div>
             </mat-card-actions>
         </mat-card>
-        <mat-card *ngIf="stepData?.comment !== null" class="example-card">
-            <mat-card-header>
-                <mat-card-title>Supervisor's comment</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-                <p>{{stepData.comment}}</p>
-            </mat-card-content>
-        </mat-card>
     </div>
     <div class="centered-card">
         <mat-card *ngIf="!noPaper" class="example-card">
@@ -51,19 +43,19 @@
                 <mat-card-title>Attachments</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-                <mat-nav-list>
+                <p *ngIf="stepData.attachments.length === 0">No attachments</p>
+                <mat-nav-list *ngIf="stepData.attachments.length !== 0">
                     <div *ngFor="let attachment of stepData.attachments">
-                        <a mat-list-item (click)="download(attachment)"> {{ attachment.name }}
-                            Download </a>
+                        <a mat-list-item (click)="download(attachment)">{{ attachment.name }}</a>
                     </div>
                 </mat-nav-list>
             </mat-card-content>
             <mat-card-actions>
                 <div *ngIf="!noPaper">
-                    <div class="col-sm-4" *ngIf="stepData.stepStatus !== 5 && stepData.stepStatus !== 2">
+                    <div class="col-sm-4" *ngIf="stepData.stepStatus !== 5 && stepData.stepStatus !== 2 && stepData.stepStatus !== 3">
                         <div class="form-group">
                             <label for="file">Choose File</label>
-                            <input type="file" id="file" (change)="handleFileInput($event.target.files)">
+                            <input type="file" id="file" (change)="handleFileInput($event.target.files)" accept="image/png">
                         </div>
                         <!-- <input #csvInput hidden="true" type="file" onclick="this.value=null" (change)="fileInputChange($event)" />
                         <button mat-flat-button color="primary" (click)="csvInput.click()">Choose attachment</button> -->
@@ -71,7 +63,7 @@
                 </div>
             </mat-card-actions>
         </mat-card>
-        <mat-card *ngIf="stepData?.comment !== null" class="example-card">
+        <mat-card *ngIf="stepData?.comment !== null" class="example-card card-margin">
             <mat-card-header>
                 <mat-card-title>Supervisor's comment</mat-card-title>
             </mat-card-header>

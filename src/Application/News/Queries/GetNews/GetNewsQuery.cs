@@ -34,7 +34,7 @@ namespace tti_graduation_work.Application.News.Queries.GetNews
 			var data = _newsFeedService.GetNews();
 			return new NewsVm
 			{
-				FeedItems = data.AsQueryable().ProjectTo<FeedItem>(_mapper.ConfigurationProvider).ToList()
+				FeedItems = data?.AsQueryable().ProjectTo<FeedItem>(_mapper.ConfigurationProvider).ToList()
 			};
 		}
 	}

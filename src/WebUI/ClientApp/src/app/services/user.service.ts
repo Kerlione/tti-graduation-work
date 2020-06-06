@@ -51,7 +51,7 @@ export class UserService {
   }
 
   public getUserId(): number {
-    return this.getTokenData().nameid;
+    return +this.getTokenData().nameid;
   }
 
 

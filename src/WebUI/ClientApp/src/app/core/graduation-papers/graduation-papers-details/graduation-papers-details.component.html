@@ -39,7 +39,7 @@
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
                     <td mat-cell *matCellDef="let row; let i = index">
-                        <button *ngIf="allowEdit(i)" mat-button color="primary" (click)="edit(i)" [routerLink]="['..', 'step', row.id ]">Details</button>
+                        <button *ngIf="allowEdit(i) || isPaperSupervisor()" mat-button color="primary" (click)="edit(i)" [routerLink]="['..', 'step', row.id ]">Details</button>
                         <button *ngIf="row.stepStatus === 2 && isPaperSupervisor()" mat-button color="primary" (click)="approve(i)">Approve</button>
                         <button *ngIf="row.stepStatus === 2 && isPaperSupervisor()" mat-button color="primary" (click)="reject(i)">Reject</button>
                         <button *ngIf="allowNotify(row)" mat-button color="primary" (click)="notify(i)">Notify</button>

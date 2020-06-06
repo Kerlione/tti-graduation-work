@@ -51,7 +51,6 @@ namespace tti_graduation_work.Application.Steps.Commands.UpdateStepCommand
             step.StepData = request.Data;
 
             step.StepStatus = StepStatus.InProgress;
-
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;

@@ -10,6 +10,7 @@ using tti_graduation_work.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using tti_graduation_work.Infrastructure.NewsFeed;
 using tti_graduation_work.Infrastructure.Notifications;
+using Microsoft.Extensions.Logging;
 
 namespace tti_graduation_work.Infrastructure
 {
@@ -36,6 +37,12 @@ namespace tti_graduation_work.Infrastructure
             //    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
             services.AddTransient<IDateTime, DateTimeService>();
+
+            services.AddLogging(logging =>
+            {
+                logging.AddConsole();
+                logging.AddDebug();
+            });
 
             services.AddTransient<IExternalAuthenticationService, ExternalAuthenticationService>();
             services.AddTransient<INotificationService, NotificationService>();

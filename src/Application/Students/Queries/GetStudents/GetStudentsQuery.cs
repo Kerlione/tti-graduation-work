@@ -34,7 +34,7 @@ namespace tti_graduation_work.Application.Students.Queries.GetStudents
         {
             return new StudentsVm
             {
-                Students = await _context.Students.Include(s => s.GraduationPaper).ThenInclude(p=>p.Steps).ProjectTo<StudentDto>(_mapper.ConfigurationProvider)
+                Students = await _context.Students.Include(s => s.GraduationPaper).ThenInclude(p=>p.Steps).AsNoTracking().ProjectTo<StudentDto>(_mapper.ConfigurationProvider)
                 .OrderBy(s => s.Id)
                 .ToListAsync(cancellationToken),
                 Total = _context.Students.Count()

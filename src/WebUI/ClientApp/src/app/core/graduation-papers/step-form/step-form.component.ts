@@ -73,7 +73,9 @@ export class StepFormComponent implements OnInit {
                 this.stepData.stepStatus === 2 || this.stepData.stepStatus === 3 || this.stepData.stepStatus === 5);
               if (this.stepDataModel.isForm) {
                 this.form = this.sfs.toFormGroup(this.stepDataModel.formData);
-                this.form.setValue(JSON.parse(this.stepData.data));
+                if (this.stepData.data !== null) {
+                  this.form.setValue(JSON.parse(this.stepData.data));
+                }
               }
               if (this.stepData.stepStatus === 2 || this.stepData.stepStatus === 3 || this.stepData.stepStatus === 5) {
                 this.form.disable();
@@ -108,7 +110,7 @@ export class StepFormComponent implements OnInit {
   public sendToReview() {
     this.stepsClient.sendToReview(this.paperId, this.stepId,
       SendStepToReviewCommand.fromJS({ stepId: this.stepId, graduationPaperId: this.paperId })).subscribe(result => {
-        if (result) {
+        if (result.status === 200) {
           this.notificationService.success('Sent to review');
           this.getStep();
         }
@@ -123,8 +125,10 @@ export class StepFormComponent implements OnInit {
   public finishStep() {
     this.stepsClient.finishStep(this.paperId, this.stepId,
       FinishStepCommand.fromJS({ stepId: this.stepId, graduationPaperId: this.paperId })).subscribe(result => {
-        this.notificationService.success('Finished successfully');
-        this.getStep();
+        if (result.status === 200) {
+          this.notificationService.success('Finished successfully');
+          this.getStep();
+        }
       }, error => {
         this.notificationService.error(error);
       });
@@ -146,7 +150,6 @@ export class StepFormComponent implements OnInit {
   }
   handleFileInput(files: FileList) {
     this.fileToUpload = files.item(0);
-    console.log(this.fileToUpload);
     const reader = new FileReader();
     reader.readAsDataURL(this.fileToUpload);
 
@@ -156,7 +159,7 @@ export class StepFormComponent implements OnInit {
 
     let fileParam: FileParameter = { data: this.fileToUpload, fileName: this.fileToUpload.name };
     this.stepsClient.uploadAttachment(this.paperId, this.stepId, fileParam).subscribe(result => {
-
+      this.getStep();
     });
 
     return;
@@ -166,7 +169,16 @@ export class StepFormComponent implements OnInit {
     return this.userService.getUserId() == this.stepData.studentId;
   }
 
-  public download(attachment: AttachmentDto) {
-    console.log(attachment);
+  public download(attachment: AttachmentDto): string {
+    const byteCharacters = atob(attachment.data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image/png' });
+    const url = window.URL.createObjectURL(blob);
+    window.open(url);
+    return 'data:image/png;base64,' + attachment.data;
   }
 }

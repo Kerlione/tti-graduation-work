@@ -34,7 +34,7 @@ namespace tti_graduation_work.Application.Supervisors.Queries.GetSupervisors
         {
             return new SupervisorsVm
             {
-                Supervisors = await _context.Supervisors.Include(s => s.Faculty).Take(request.Take).Skip(request.Skip)
+                Supervisors = await _context.Supervisors.Include(s => s.Faculty).AsNoTracking().Take(request.Take).Skip(request.Skip)
                 .ProjectTo<SupervisorDto>(_mapper.ConfigurationProvider)
                 .OrderBy(x => x.Id)
                 .ToListAsync(cancellationToken),

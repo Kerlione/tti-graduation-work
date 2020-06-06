@@ -53,9 +53,14 @@ namespace tti_graduation_work.Application.Steps.Commands.FinishStep
 
             step.StepStatus = StepStatus.Finished;
 
+            if(step.StepType == PaperStep.ThesisDefence)
+            {
+                graduationPaper.PaperStatus = PaperStatus.Finished;
+            }
+
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
-        }        
+        }
     }
 }
