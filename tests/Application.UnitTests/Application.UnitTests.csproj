@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -10,8 +10,11 @@
 
   <ItemGroup>
     <Compile Remove="Common\**" />
+    <Compile Remove="GraduationPapers\GetPaper\**" />
     <EmbeddedResource Remove="Common\**" />
+    <EmbeddedResource Remove="GraduationPapers\GetPaper\**" />
     <None Remove="Common\**" />
+    <None Remove="GraduationPapers\GetPaper\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,11 +28,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Application\Application.csproj" />
     <ProjectReference Include="..\..\src\Infrastructure\Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GraduationPapers\GetPaper\" />
-    <Folder Include="Students\" />
   </ItemGroup>
 
 </Project>
